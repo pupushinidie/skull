@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App.js";
 import { applyTheme, readTheme } from "./theme.js";
 import "./styles.css";
-// 像素风皮肤叠在 styles.css 上面：app-pixel.css 管首页和等候房间，board.css 管牌桌（现在是调试牌桌）。
+// 像素风皮肤叠在 styles.css 上面：app-pixel.css 管首页和等候房间，sk.css 管牌桌、首页和等候房间的骷髅牌部分。
 // 白天版由 day-theme.ts 接在它们后面生成，theme-day.css 是手调的部分。
 import "./app-pixel.css";
-import "./board.css";
+import "./sk.css";
 import "./theme-day.css";
 
 applyTheme(readTheme());

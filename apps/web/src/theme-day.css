@@ -1,7 +1,28 @@
 /*
- * 白天版手调的部分。大部分白天样式由 day-theme.ts 从 app-pixel.css、board.css 换色生成，
+ * 白天版手调的部分。大部分白天样式由 day-theme.ts 从 app-pixel.css、sk.css 换色生成，
  * 这里只放机械换色不合适的地方；选择器都以 :root[data-theme="day"] 开头。
  */
 :root[data-theme="day"] { color-scheme: light; }
-:root[data-theme="day"] .app-shell * { scrollbar-color: #aebad0 var(--bg); }
+:root[data-theme="day"] .app-shell * { scrollbar-color: #d8c3a0 var(--bg); }
 
+/* 牌桌（深色木牌）上的文字和按钮保持夜间配色：变量换回夜间值，按钮换回深木色 */
+:root[data-theme="day"] .app-shell .sk-stage {
+  --bg: #140b07;
+  --panel: #2a1610;
+  --panel-2: #3a2015;
+  --edge: #070302;
+  --rim: #7a4a2a;
+  --shade: #0d0604;
+  --text: #f6ead2;
+  --muted: #c4a684;
+  --gold: #f0c050;
+  --gold-2: #b3821c;
+  --ok: #62c97a;
+  --bad: #f25c5c;
+}
+:root[data-theme="day"] .app-shell .sk-stage .quiet-button:not(.danger) { --rim: #9a6440; --shade: #1e0d07; color: #f6ead2; background: #4a2a1a; }
+:root[data-theme="day"] .app-shell .sk-stage .quiet-button:not(.danger):hover:not(:disabled) { color: #f6ead2; background: #4a2a1a; }
+:root[data-theme="day"] .app-shell .sk-stage :is(.primary-button, .quiet-button):disabled { filter: grayscale(0.6) brightness(0.7); }
+:root[data-theme="day"] .app-shell .sk-stage .sk-emote-button { color: #f6ead2; background: #3a2015; box-shadow: 0 0 0 var(--px) #070302, inset var(--px) var(--px) 0 0 #7a4a2a, inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 #0d0604; }
+/* 白天的木桌比较亮，暗角压浅一点 */
+:root[data-theme="day"] .sk-stage::before { background: radial-gradient(ellipse at center, transparent 60%, rgba(60, 30, 10, 0.3) 100%); }

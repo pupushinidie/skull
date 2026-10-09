@@ -1,5 +1,6 @@
 import type { PublicRoomSummary } from "@skull/game";
 import AdminBar, { adminEntryEnabled, useAdminToken } from "./AdminBar.js";
+import { useConfirm } from "./confirm.js";
 import { socket } from "./socket.js";
 
 const statusLabels: Record<PublicRoomSummary["status"], string> = {
@@ -20,10 +21,12 @@ function OnlineRooms({ rooms, connected, busy, onJoin }: {
     0,
   );
   const admin = useAdminToken();
+  const [confirm, confirmDialog] = useConfirm();
 
-  function dissolve(room: PublicRoomSummary) {
+  async function dissolve(room: PublicRoomSummary) {
     const names = room.players.map((player) => player.name).join("、");
-    if (!window.confirm(`确定解散这个房间吗？（${names}）所有玩家都会被移出。`)) return;
+    const ok = await confirm({ title: "解散这个房间？", detail: `${names}：所有玩家都会被移出。`, confirmLabel: "解散" });
+    if (!ok) return;
     admin.setError("");
     socket.emit("admin:dissolve", { roomId: room.id, token: admin.token }, (response) => {
       if (!response.ok) admin.setError(response.error);
@@ -32,6 +35,7 @@ function OnlineRooms({ rooms, connected, busy, onJoin }: {
 
   return (
     <section className="online-rooms" aria-labelledby="online-rooms-title">
+      {confirmDialog}
       <div className="online-rooms-heading">
         <div>
           <span className="section-kicker">LIVE TABLES</span>

@@ -1,63 +1,69 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DiscImg, Icon } from "./pieces.js";
+import { matArt } from "./art.js";
 
-/** 规则说明：用自己的话写，不照搬原版规则书。 */
-function GameRules() {
+/** 规则说明：顶栏一个按钮，点开是像素弹窗。用自己的话写，配游戏里的图。 */
+function GameRules({ label = "规则" }: { label?: string }) {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const handle = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", handle);
+    return () => window.removeEventListener("keydown", handle);
+  }, [open]);
 
   return (
-    <section className={open ? "game-rules open" : "game-rules"}>
-      <button
-        className="game-rules-toggle"
-        type="button"
-        aria-expanded={open}
-        aria-controls="game-rules-panel"
-        onClick={() => setOpen((current) => !current)}
-      >
-        <span aria-hidden="true">✦</span> 游戏规则
-        <i aria-hidden="true">{open ? "收起 ▴" : "展开 ▾"}</i>
-      </button>
-
+    <>
+      <button className="quiet-button sk-rules-button" type="button" aria-expanded={open} onClick={() => setOpen(true)} data-tutorial="rules-button">{label}</button>
       {open && (
-        <div className="game-rules-panel" id="game-rules-panel">
-          <div className="game-rules-block">
-            <h3>目标</h3>
-            <p>
-              每人 4 张背面一样的垫子：<b>3 朵玫瑰、1 个骷髅</b>。当挑战者<b>成功两次</b>就赢（第一次垫板翻到花面）；
-              或者别人都被淘汰、只剩你。
-            </p>
-          </div>
-
-          <div className="game-rules-block">
-            <h3>一轮怎么打</h3>
-            <ul>
-              <li><b>同时盖第 1 张</b>：所有人挑一张扣着盖到自己板上。</li>
-              <li><b>轮流</b>：轮到你时再盖一张，或者<b>开叫</b>一个数：「我能连翻这么多张都是玫瑰」，最少 1，最多是场上盖着的总数。谁都可以第一次轮到就开叫；手里没垫子了只能开叫。</li>
-              <li><b>加注</b>：有人开叫后谁都不能再盖。轮到你就加注（更大的数）或者 pass；pass 了这一轮就不能再加。只剩一人没 pass、或者有人叫到场上总数，叫得最高的人当<b>挑战者</b>。</li>
-            </ul>
-          </div>
-
-          <div className="game-rules-block">
-            <h3>翻牌</h3>
-            <ul>
-              <li>挑战者<b>先翻自己板上的</b>（从最上面往下，系统自动翻），再一张张翻别人的：每块板只能翻最上面那张，每翻一张都可以换板。</li>
-              <li>翻满都是玫瑰：<b>成功</b>，垫板翻到花面；已经是花面就赢了。</li>
-              <li>翻到骷髅马上停：<b>失败</b>，只有挑战者受罚。翻到别人的骷髅，系统随机拿走你一张；翻到自己的骷髅，你自己挑一张丢。丢的是什么只有你知道。垫子丢光就淘汰。</li>
-              <li>失败后，其他人可以点「亮出我的垫子」，把自己板上没翻开的全部亮给大家看。</li>
-            </ul>
-          </div>
-
-          <div className="game-rules-block">
-            <h3>其他</h3>
-            <ul>
-              <li>下一轮由挑战者先手；他被别人的骷髅淘汰时由那个骷髅的主人先手，被自己的骷髅淘汰时由他指定。</li>
-              <li>超时：系统替你随机盖一张、没垫子时开叫 1、加注时 pass、选板时翻顺时针第一块、自选丢牌时随机丢。连续两次超时由人机托管。</li>
-              <li>Last Chance 碟（开房选项）：失败后只剩 1 张的人，下一轮多拿一张大家都知道是玫瑰的碟子。</li>
-              <li>所有随机都在服务器上，谁也做不了手脚。掉线后用原昵称和房间码可以回到自己的座位。</li>
-            </ul>
-          </div>
+        <div className="gm-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}>
+          <section className="gm-panel sk-rules" role="dialog" aria-modal="true" aria-labelledby="sk-rules-title">
+            <header className="sk-rules-head">
+              <h2 id="sk-rules-title">骷髅牌怎么玩</h2>
+              <button className="quiet-button" type="button" onClick={() => setOpen(false)}>关闭</button>
+            </header>
+            <div className="sk-rules-body">
+              <div className="sk-rules-block">
+                <h3>每人 4 张垫子</h3>
+                <div className="sk-rules-pics">
+                  <DiscImg face="rose" scale={2} /><DiscImg face="rose" scale={2} /><DiscImg face="rose" scale={2} /><DiscImg face="skull" scale={2} />
+                  <span className="sk-rules-eq">背面都一样</span>
+                  <DiscImg face="back" scale={2} />
+                </div>
+                <p>3 朵<b>玫瑰</b>、1 个<b>骷髅</b>。当挑战者<b>成功两次</b>就赢：第一次垫板翻到花面
+                  <img className="sk-rules-mat" src={matArt(0, true)} width={56} height={64} alt="" />，再成功一次赢下整局。别人都出局、只剩你，也算赢。</p>
+              </div>
+              <div className="sk-rules-block">
+                <h3>一轮怎么打</h3>
+                <ol>
+                  <li><b>大家同时</b>扣着盖 1 张到自己板上。</li>
+                  <li>轮到你：<b>再盖一张</b>，或者<b>开叫</b>一个数——「我能连翻这么多张，一张骷髅都不碰」。最少 1，最多是<b>场上盖着的总数</b>。谁都可以第一次轮到就开叫；手里没垫子了只能开叫。</li>
+                  <li>有人开叫后谁都不能再盖：轮到你就<b>加注</b>（更大的数）或者<b>过</b>。过了这一轮就不能再叫。</li>
+                  <li>只剩一人没过，或者有人叫到场上总数，叫得最高的人当<b>挑战者</b> <Icon name="lantern" scale={1} />。</li>
+                </ol>
+              </div>
+              <div className="sk-rules-block">
+                <h3>翻牌</h3>
+                <ul>
+                  <li>挑战者<b>先翻自己板上的</b>（从上往下，系统自动翻），再一张张翻别人的：每块板<b>只能翻最上面那张</b>，每翻一张都可以换板。</li>
+                  <li>翻满都是玫瑰：<b>成功</b>。翻到骷髅马上停：<b>失败</b>，只有挑战者受罚，骷髅的主人没事。</li>
+                  <li>失败要丢一张：翻到别人的骷髅，系统随机拿走你一张；翻到自己的骷髅，你自己挑一张。<b>丢的是什么只有你知道</b>。丢光就出局。</li>
+                  <li>失败后，其他人可以点 <Icon name="eye" scale={1} />「亮出我的垫子」，给大家看看自己没唬人。</li>
+                </ul>
+              </div>
+              <div className="sk-rules-block">
+                <h3>其他</h3>
+                <ul>
+                  <li>下一轮挑战者先手 <Icon name="key" scale={1} />；他出局了由那个骷髅的主人先手，被自己骷髅弄出局的由他指定。</li>
+                  <li>每一步都有时限，超时系统替你随机盖一张、开叫 1、过或随机翻；连续两次超时由人机托管，点「取消托管」就拿回来。掉线了用原昵称和房间码回到座位。</li>
+                  <li>Last Chance 碟 <Icon name="lc" scale={1} />（开房选项）：失败后只剩 1 张的人，下一轮多拿一张大家都知道是玫瑰的银碟。</li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
       )}
-    </section>
+    </>
   );
 }
 

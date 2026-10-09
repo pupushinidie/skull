@@ -37,3 +37,29 @@ export function createRng(seed: number): Rng {
     },
   };
 }
+
+/**
+ * 按剧本出数的随机数（教程、测试用）：int(n) 依次从 ints 里取（取完后回到种子随机数），
+ * 比如别人骷髅时随机失牌 int(手里张数) 取到几就丢第几张。
+ */
+export function scriptedRng(ints: readonly number[], seed = 1): Rng {
+  const fallback = createRng(seed);
+  let index = 0;
+  const int = (maxExclusive: number) => {
+    if (index < ints.length) {
+      const value = ints[index++]!;
+      if (value < 0 || value >= maxExclusive) throw new Error(`剧本随机数 ${value} 超出范围 0–${maxExclusive - 1}`);
+      return value;
+    }
+    return fallback.int(maxExclusive);
+  };
+  return {
+    next: () => fallback.next(),
+    int,
+    pick: (items) => items[int(items.length)]!,
+    shuffle: (items) => fallback.shuffle(items),
+    get state() {
+      return fallback.state;
+    },
+  };
+}

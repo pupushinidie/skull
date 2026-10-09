@@ -1,27 +1,45 @@
 export * from "./types.js";
-export * from "./board.js";
 export {
-  advanceRunners,
+  advance,
+  advanceWith,
+  alivePlayers,
   apply,
   applyCommand,
-  bustProbability,
+  canRevealStack,
   createGame,
+  DEFAULT_TIMEOUTS,
   defaultConfig,
+  discCount,
+  findPlayer,
+  flippableMats,
+  holdsLastChance,
+  LAST_CHANCE_ID,
   legalActions,
-  moveOptions,
+  needsAdvance,
+  newRoundLog,
+  nextPlayer,
+  optionsToConfig,
   redactGameForViewer,
+  stepKey,
+  stepTimeoutMs,
+  timeoutCommand,
   timeoutTurn,
+  totalDiscsInPlay,
+  unrevealedCount,
+  waitingFor,
 } from "./engine.js";
-export type { NewPlayer } from "./engine.js";
+export type { NewPlayer, RedactOptions } from "./engine.js";
 export { botCommand } from "./bot.js";
-export { createRng } from "./rng.js";
+export { createRng, scriptedRng } from "./rng.js";
 export type { Rng } from "./rng.js";
-export { CAPACITY_OPTIONS, DEFAULT_ROOM_ACCESS } from "./roomTypes.js";
+export { CAPACITY_OPTIONS, DEFAULT_ROOM_ACCESS, EMOTE_COOLDOWN_MS, EMOTE_IDS } from "./roomTypes.js";
 export type {
   AckResponse,
   Capacity,
   ClientToServerEvents,
   CreateRoomPayload,
+  EmoteBroadcast,
+  EmoteId,
   IceServerConfig,
   JoinRoomPayload,
   LobbyMember,

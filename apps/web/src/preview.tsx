@@ -214,7 +214,7 @@ function BoardPreview() {
         watchId={watchId}
         onWatch={setWatchId}
         onLeave={() => setError("预览页：离开")}
-        hint={params.get("hint") === "1" ? botHint(redactGameForViewer(full, viewer), viewer, () => 0.5)?.reason : undefined}
+        hint={params.get("hint") === "1" ? botHint(redactGameForViewer(full, viewer), viewer, () => 0.99)?.reason : undefined}
       />
       {confirmDialog}
     </main>

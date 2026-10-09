@@ -274,7 +274,7 @@ const game = buildGame({
 - **自己的垫子**：手牌显示正面；板上没翻开的自己那几张也画正面但压暗（别人看到的是背面）。
 - **预览页**：`/preview.html?s=<场景>`。场景是规则包 `SCENE_NAMES`（opening、myTurn、bidding、chooseMat、loseChoosing、chooseFirst、revealAfterFail、sixPlayers、gameOverTwoWins……），另有 `fullTable`（6 人每人 4 张）、`home`、`home-rooms`、`waiting-1` / `waiting-full` / `waiting-bots` / `waiting-guest` / `waiting-spec`。参数：`n` 人数、`v` 视角、`bots` / `auto` / `offline` 座位、`spec=1`（`all=1` 看底牌）、`t` 倒计时毫秒（`none` 不显示）、`chat=1`、`live=1`（别人由人机走、系统自动翻）、`emotes=p2:laugh,p3:skull`（每 2 秒冒气泡）、`rematch=1`、`lc=1`、`hint=1`（操作面板显示 `botHint` 的理由）。
 - **键盘**：1–5 选手牌、回车盖 / 叫 / 丢、←/→ 调叫价、P 过、空格继续、Esc 取消选择。页面在后台、轮到你时标题前面加「【轮到你】」。
-- **提示**：`GameBoard` 的 `hint` 属性显示一句提示（教程的「提示」按钮用 `botHint(view, me)` 的 `reason`）；正式对局没有传。
+- **提示**：`GameBoard` 的 `hint` 属性显示一句提示（教程的「提示」按钮用 `botHint(view, me, () => 0.99)` 的 `reason`）；正式对局没有传。
 - 截图量化脚本：`~/projects/qa-reports/tools/skull-scenes.sh`（预览页场景 × 四种尺寸 × 两套主题）、`skull-play.mjs`（网页上真打一整局）。
 
 ## 目录

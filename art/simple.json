@@ -1,0 +1,450 @@
+{
+ "discs/back.png": {
+  "size": [
+   32,
+   36
+  ],
+  "sha256": "1e3bbd42fb21c27ef247b564596e09adfb0d98c2fa70edf00679360cb607050a"
+ },
+ "discs/rose.png": {
+  "size": [
+   32,
+   36
+  ],
+  "sha256": "c93a5888429ff50ddb9191b65c523133362b4a1ea3bc11c5e97232ef6fb3c8df"
+ },
+ "discs/skull.png": {
+  "size": [
+   32,
+   36
+  ],
+  "sha256": "c496e83722d51d34e104de806bca637d367f852f54a59a1b2442054e1a7104ba"
+ },
+ "discs/lc-down.png": {
+  "size": [
+   32,
+   36
+  ],
+  "sha256": "f880a91a968b5efc5b1b9dea82c34dbe03dc7b7427a62d21d6e988a762f22b32"
+ },
+ "discs/lc-up.png": {
+  "size": [
+   32,
+   36
+  ],
+  "sha256": "7e951ca6abf56bb83557f31354ed130ed2eab9c8d6ae1b43599feb2680bc5a8d"
+ },
+ "mats/mat-0-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "99d536bcccba504cebacda9e76e3cce4bcbe0df04fe654f90d1bab5176da7ea0"
+ },
+ "mats/mat-0-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "04dc7f803bcd65128e5071e5f93c7074b23f14cddbcbf75298e1b538454b9816"
+ },
+ "mats/mat-1-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "bcfd896e5d3fde0896320e822ebf524c1c176972bf2e3d75bb8fb63a4301d1c1"
+ },
+ "mats/mat-1-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "af85673066a8562778009916a49a2caf03d150efc6291fc228d4e2f0feb67008"
+ },
+ "mats/mat-2-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "21c07885f539f41fb9d4cb3cd41bd3f59acb1dce0c0d8d4fbab19404e8d1e092"
+ },
+ "mats/mat-2-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "25f3c836f0c4529510941664f02969eb1138867b7b36ffc0e9743a08ae980f41"
+ },
+ "mats/mat-3-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "24e51fbd5a201e3d5f144226670141d767bc2208bfd6dfd3e8dde69836a45341"
+ },
+ "mats/mat-3-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "b7e842977e33d70863b7576a226c0882e33fdf4da4f5dfca8c8721c3e2e398d7"
+ },
+ "mats/mat-4-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "72056908ad34ab3e57ecb6fdd1143ea4a5d7c99d35e059205a11856e6c426cf7"
+ },
+ "mats/mat-4-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "259112e043cd9663f7964eba7a53bfcff3fd479f70b9335f521858eb2233cad4"
+ },
+ "mats/mat-5-blank.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "a2f5aaf7580dbefddc1485c93254060ae518f5ca14e853fddcccc6c48f228479"
+ },
+ "mats/mat-5-flower.png": {
+  "size": [
+   56,
+   64
+  ],
+  "sha256": "5ac7f40085afe6f14bee9b39c6ff3945784cf8b7bcebaf8aae1bd64cb45abc75"
+ },
+ "scene/night-0.png": {
+  "size": [
+   512,
+   288
+  ],
+  "sha256": "94cce8dc030f3a54145f610086cf3ad05862164edb8358afac8e5de52f93eb71"
+ },
+ "scene/night-1.png": {
+  "size": [
+   512,
+   288
+  ],
+  "sha256": "f107dba4e0b1ac5fd517009f5ef574b15d9c6a25d85395c637342f4d2d04e564"
+ },
+ "scene/day-0.png": {
+  "size": [
+   512,
+   288
+  ],
+  "sha256": "7f1cf36b5906f42ea3f5555b9d170a6893c639dab3b10fbbbc4d15052fb520d7"
+ },
+ "scene/day-1.png": {
+  "size": [
+   512,
+   288
+  ],
+  "sha256": "09f8c2f2bbce614348711b538df00a329cfee5227caabb961593068592ab7419"
+ },
+ "scene/hero.png": {
+  "size": [
+   512,
+   288
+  ],
+  "sha256": "98e63e388eb8970043db9708cae2d368f1c8f98591fb37080eb7e453e7f0106f"
+ },
+ "ui/disc.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "e6c817071b1a9fb6b97da7f8a3cae781402bf52659457765ee9e026b59d74a79"
+ },
+ "ui/stack.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "89c43f79407dfb3a0971dbaaa220a93d09c09153860ddf996c2d37203eee986b"
+ },
+ "ui/bell.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "a69438b0ee98d850ab8c2b22dc86ee61d7c83f07696ff1fb9a767eb72ea73d15"
+ },
+ "ui/pass.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "1141434d4ee3d18adb0a0a246d52ac16e195e7b5e690c0acae9f4f4d7d98c9e6"
+ },
+ "ui/key.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "07414bb75c285251891d432f316cbed71ed59065615c6b192438acdf9a4489e9"
+ },
+ "ui/rose.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "ab47f489c418156884c8e50c193be53a5df3234062999feca11126f894fcf686"
+ },
+ "ui/eye.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "cd37a09a97181a2332ab8bc5e58d5b1565815241ac5af4f530aa19499d474f11"
+ },
+ "ui/ready.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "cc7718abdfe853511db3617db106d15876ae74cd26070e6ba125d0913204810a"
+ },
+ "ui/lc.png": {
+  "size": [
+   16,
+   16
+  ],
+  "sha256": "5bfbee9fe8241b2bbf921be2a7a57dc8178dd4eeadac25bfc481f283cb5e70cc"
+ },
+ "ui/thinking.png": {
+  "size": [
+   64,
+   16
+  ],
+  "sha256": "78ba719d227fe60d488af960529a6ceaacca5ea9e477d5667480a8dd58b3c17a"
+ },
+ "ui/lantern.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "59812f55fc398855e84fbd80b35145e9fc9c25308de1c86807ba048f5f8dc831"
+ },
+ "ui/out.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "6322572a1556b6a5cc2299aa67112facca9a9b8b0abd13f5d4ea72029db8418b"
+ },
+ "ui/trophy.png": {
+  "size": [
+   48,
+   48
+  ],
+  "sha256": "8558877a7a3edc60dc298af34a473301ad3be45f965ea8add8c8c2164c9f3716"
+ },
+ "ui/ribbon.png": {
+  "size": [
+   96,
+   24
+  ],
+  "sha256": "fd939d62abe28a4563810f7605bc47614907cadcfe7986d904281a9902898ba5"
+ },
+ "ui/bubble.png": {
+  "size": [
+   40,
+   44
+  ],
+  "sha256": "7ae8b4221decd144d40c3d6ddd3c599edc17c98a0dacfb5aaa9a9fdb58f9a7f9"
+ },
+ "ui/frame.png": {
+  "size": [
+   24,
+   24
+  ],
+  "sha256": "a4711317bd7005f04b355768af97eef6fac94f7c925fe2a3a18b870af69ecb93"
+ },
+ "avatars/avatar-0.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "c9f2835e089db03f45a1ded8c065e26d6af1e149d8c051e548d74cc956b838b7"
+ },
+ "avatars/avatar-1.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "ecaae38641b4b8ef8cbaaf180ad52b8cbec2c19eb97fae7e4df0caf1e4b6b9fc"
+ },
+ "avatars/avatar-2.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "b2fade95c89b108fb4c3adafd3a6fc495bcfbff8a789d66403a62478b8ff67ed"
+ },
+ "avatars/avatar-3.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "3fe07f5c77816f21b0dd1a9064938fab9f158292cc8936584184425617af93b9"
+ },
+ "avatars/avatar-4.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "5c994513acf6d94e2c9a8e8b76f1b0e3371055685d1b474504d46f7761658e33"
+ },
+ "avatars/avatar-5.png": {
+  "size": [
+   32,
+   32
+  ],
+  "sha256": "8fc22a80aa3ce5fe284d23810ad9faa9e21cc11104571768de6603a560fa6c07"
+ },
+ "emotes/rose.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "00ab22e7630b86fbb6ab16af599808adacbce0dca42c66486ff0844fbbe096d2"
+ },
+ "emotes/skull.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "134258f2d5bd1432e0e2bd27d24bed00b16f1ddb06bf4db2ec6284e4f779145f"
+ },
+ "emotes/taunt.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "ee44dc4f3a1102240aad4ebedc6cd8f112cdaad8e25c6cde8c9307d0b6315578"
+ },
+ "emotes/shrug.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "eaeb58ffd4ec5cd46f37d3ae4e5baad116d7695a2f779cda05b2015ff2d50726"
+ },
+ "emotes/think.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "64e25b07e30fc777c45db27e6b9a8467f9f51637141a25aa419b9ae588294a2b"
+ },
+ "emotes/laugh.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "d26bf9101df73a17b0f7fc4b2f1fd665144eca0bba6e6a58db21528fcc2ba43c"
+ },
+ "emotes/sweat.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "eee4484f2615829beed8e9d55aef2b092a5258465535e0661d793503b602f050"
+ },
+ "emotes/shock.png": {
+  "size": [
+   128,
+   32
+  ],
+  "sha256": "2ddca9e660bc3a2be840c6fb869e4d38c59ec1eedbd050196005a7e14bc10a70"
+ },
+ "fx/flip-rose.png": {
+  "size": [
+   256,
+   40
+  ],
+  "sha256": "1878cb0d472b91aa8139b5c010a41fb49e044acffe4066e244714ad7b6108fd2"
+ },
+ "fx/flip-skull.png": {
+  "size": [
+   256,
+   40
+  ],
+  "sha256": "89bc854af45c86ea160d97c4f5cda6d88742767643a35e8e1b05417258153e64"
+ },
+ "fx/flip-lc.png": {
+  "size": [
+   256,
+   40
+  ],
+  "sha256": "34d74b11f2cd68ae0290d28453738e214d033575cb7a0be30f8f8ae6fb772f88"
+ },
+ "fx/skull-hit.png": {
+  "size": [
+   512,
+   64
+  ],
+  "sha256": "558883b9eaf2f4116113ba39322c76ccdf359d757e7f28a92d150f2a38e2e66e"
+ },
+ "fx/rose-pop.png": {
+  "size": [
+   288,
+   48
+  ],
+  "sha256": "56d1b78c4fb4ec150c7c16d4c1f263e82e1766a6766b4ca22644399bb0823dd6"
+ },
+ "fx/success.png": {
+  "size": [
+   768,
+   96
+  ],
+  "sha256": "2519aeb816fcb0af642c4c10220dd8235e2036daf73dc403b75e6e20a8a0ba56"
+ },
+ "fx/mat-win.png": {
+  "size": [
+   448,
+   64
+  ],
+  "sha256": "0e49cf4e833069e67130a6a26b2372c0f7be33f1e6c810773fe9fc7dbf4d0fbb"
+ },
+ "fx/lose-disc.png": {
+  "size": [
+   256,
+   40
+  ],
+  "sha256": "ee0a030527df9c94d526f1578b59cca7f9ad10116b0ca8a422123a029827a7d1"
+ },
+ "fx/snuff.png": {
+  "size": [
+   256,
+   48
+  ],
+  "sha256": "750d8e52d518d093e0f04a7288c9156d15dc21c8079122fb8ac7d789dbf3ea3e"
+ },
+ "fx/candle.png": {
+  "size": [
+   64,
+   32
+  ],
+  "sha256": "74bd82a0f3ced9bbbe797f8e5c81523cf70db99b8d63c4b92cf6ac1910afac9d"
+ },
+ "fx/petals.png": {
+  "size": [
+   512,
+   64
+  ],
+  "sha256": "580e250ea3cc621dedb0b63a4439fda0c9c0626c046d5c66019fd1b2fec7f755"
+ },
+ "fx/sparkle.png": {
+  "size": [
+   96,
+   16
+  ],
+  "sha256": "156c25fcaaac88b843b997e59764b916f515392cc6a0f1e7774f5adeef87baab"
+ }
+}

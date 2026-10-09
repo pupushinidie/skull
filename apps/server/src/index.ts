@@ -595,7 +595,7 @@ function runAuto(room: RoomState, key: string): void {
 function expireTurn(room: RoomState, key: string): void {
   const game = room.game;
   if (rooms.get(room.code) !== room || !game || game.phase === "gameOver" || stepKey(game) !== key) return;
-  delete room.turn;
+  clearTurnTimer(room);
   if (game.phase !== "roundEnd") {
     for (const playerId of waitingFor(game)) {
       if (robotSeat(room, playerId)) continue;

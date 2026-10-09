@@ -565,6 +565,8 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
             key={id}
             type="button"
             className={["sk-hand-disc", isSelected ? "selected" : ""].filter(Boolean).join(" ")}
+            data-tutorial={`hand-disc-${index}`}
+            data-face={face}
             disabled={!handSelectable || busy || blocked}
             onClick={() => disc.id && pickDisc(disc.id)}
             aria-label={`${face === "rose" ? "玫瑰" : face === "skull" ? "骷髅" : face === "lc-up" ? "Last Chance 碟" : "垫子"}${isSelected ? "（已选中，再点一下确认）" : ""}`}
@@ -893,8 +895,8 @@ function EmoteButton({ onSend, cooling, error }: { onSend: (id: EmoteId) => void
   const [open, setOpen] = useState(false);
   return (
     <div className="sk-emote-pop-wrap" data-tutorial="emotes">
-      <button className="quiet-button sk-emote-toggle" type="button" aria-expanded={open} onClick={() => setOpen(!open)}>
-        <Sprite sheet={emoteSheet("taunt")} scale={1} mode="still" /> 表情
+      <button className="quiet-button sk-emote-toggle" type="button" aria-expanded={open} aria-label="快捷表情" onClick={() => setOpen(!open)}>
+        <Sprite sheet={emoteSheet("taunt")} scale={1} mode="still" /><span className="sk-emote-toggle-label">表情</span>
       </button>
       {open && (
         <div className="sk-emote-pop" role="dialog" aria-label="快捷表情">

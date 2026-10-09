@@ -35,7 +35,7 @@ export function promptText(game: GameState, selfId: string, spectating: boolean,
       if (mine) return { text: me && me.hand.length > 0 ? "轮到你：再盖一张，或者开叫" : "轮到你：手里没垫子了，只能开叫", mine };
       return { text: `轮到 ${nameOf(game.turn)}：盖一张，或者开叫`, mine };
     case "bidding":
-      if (mine) return { text: `轮到你：加注（比 ${game.bid} 大），或者过`, mine };
+      if (mine) return { text: "轮到你：加注，或者过", mine };
       return { text: `轮到 ${nameOf(game.turn)}：加注，或者过`, mine };
     case "resolving":
       if (!game.awaitingMatChoice) return { text: `${subj(nameOf(game.challenger))}先翻自己板上的…还差 ${game.flipsToDo} 张`, mine: false };

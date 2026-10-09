@@ -495,7 +495,9 @@
 .sk-mobile .sk-stage .sk-hand-tip { top: -6px; }
 .sk-mobile .sk-stage .sk-plate-shown { display: none; }
 .sk-mobile .sk-stage .sk-action-stack { gap: 6px; }
-.sk-mobile .sk-stage .sk-action { grid-area: action; width: auto; min-height: 0; padding: 8px; }
+.sk-mobile .sk-stage .sk-action { display: grid; grid-area: action; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 6px; width: auto; min-height: 0; padding: 8px; }
+.sk-mobile .sk-stage .sk-emote-toggle-label { display: none; }
+.app-shell .sk-mobile .sk-stage .sk-emote-toggle { min-width: 44px; min-height: 44px; justify-content: center; padding: 4px; }
 .sk-mobile .sk-stage .sk-plate { gap: 2px; padding: 4px; }
 .sk-mobile .sk-stage .sk-plate.compact .sk-avatar img { display: none; }
 .sk-mobile .sk-stage .sk-plate.compact .sk-avatar { position: absolute; left: 0; top: 0; width: 1px; height: 1px; }

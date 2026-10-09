@@ -27,7 +27,7 @@ BASE_PATH=/skull/ npm run build
 - `BOT_DELAY_MS` 调思考时间（默认 1200），`BOT_IDLE=1` 只挂着不动（等超时），`SERVER_URL` 换服务器地址，`LAST_CHANCE=1` 建房时打开 Last Chance 碟。
 - `node scripts/spy.mjs [人数] [局数]`：抓包。两个 socket 当玩家、一个观战，连上 dev 服务器打完整局，逐条检查发给 B 和观战的数据里有没有别人的牌面、垫子 id、种子、失牌结果，有问题退出码 1。
 - 两个脚本共用 `scripts/policy.mjs` 里的简单打法（不是人机，只求各种行动都走到）。
-- 网页上的牌桌现在是**调试牌桌**（`apps/web/src/GameBoard.tsx`：把状态列出来，每个合法行动一个按钮），正式牌桌由界面阶段来做。
+- 不连服务器看各种局面：开 `http://localhost:5191/preview.html?s=<场景>`（见下面「界面」一节）。
 
 ## 规则（用自己的话说）
 
@@ -253,6 +253,29 @@ const game = buildGame({
 - `room:emote`（客户端 → 服务器）`{ id }`，`id` 是 `EMOTE_IDS` 之一；只有座位上的人能发，每 `EMOTE_COOLDOWN_MS`（2 秒）一次。服务器向房间里所有人（含观战）广播 `room:emote` `{ id, from（座位 id）, name, at }`。
 - 快照 `turnRemainingMs`：当前这一步剩余毫秒（轮到人机时没有）；首页列表 `score` 是垫板花面（1）或没有（0），`eliminated` 标出淘汰的人。
 
+## 界面（apps/web）
+
+| 文件 | 内容 |
+|---|---|
+| `src/GameBoard.tsx` | 牌桌：顶栏、提示条（轮到谁 + 倒计时）、座位、中央（场上总数 / 叫价 / 揭牌 / 结算）、手牌、操作面板、侧栏（表情、本轮记录、动作记录、聊天） |
+| `src/pieces.tsx` | 精灵图、小图标、垫子、垫板（叠放 + 特效）、名牌、表情气泡 |
+| `src/layout.ts` | 量舞台实际宽高，按对手人数挑垫板倍数（4× / 3× / 2×，同屏同倍数）；手机（<720）另走竖排 |
+| `src/describe.ts` | 提示条、结算句子、动作记录、叫价预览（叫 N 要翻自己几张、会不会翻到自己的骷髅） |
+| `src/FinalDialog.tsx` | 终局弹窗（奖杯、缎带、名次、再来一局倒计时） |
+| `src/GameRules.tsx` | 规则弹窗（顶栏「规则」按钮） |
+| `src/art.ts` | 美术文件地址和尺寸（照 `art/spec.md` 第 7 节；正式美术同名覆盖，不用改代码） |
+| `src/sk.css` | 骷髅牌的全部样式；牌桌的规则都写在 `.sk-stage` 下面 |
+| `day-palette.ts`、`src/theme-day.css` | 白天版：顶栏、侧栏、首页、等候房间换成奶白；牌桌（`.sk-stage`）保持深色木牌，背景图换成白天的蜂蜜色木桌 |
+| `preview.html` + `src/preview.tsx` | 预览页（提交进仓库，界面维护；教程、验收可以加场景，别删别人的） |
+
+- **座位顺时针**：我在最下面，下一家在我左手边，然后上面一排从左到右，最后右边。1920 下 6 人也是 4×，1440 是 3×，1024 是 2×，手机对手 1×（2–3 人局 2×）、手牌 2×。
+- **动画只看 `game.version`**：翻牌时先按住上一个状态（hold），翻面动画第 1 帧停 700ms 的悬念播完才显示结果；翻到骷髅后挑战者的板被引擎清空，界面把那一摞冻结 1.6 秒再收走，再播丢牌（背面）。临时特效的计时器放在一张持久表里，只在卸载时清空。
+- **自己的垫子**：手牌显示正面；板上没翻开的自己那几张也画正面但压暗（别人看到的是背面）。
+- **预览页**：`/preview.html?s=<场景>`。场景是规则包 `SCENE_NAMES`（opening、myTurn、bidding、chooseMat、loseChoosing、chooseFirst、revealAfterFail、sixPlayers、gameOverTwoWins……），另有 `fullTable`（6 人每人 4 张）、`home`、`home-rooms`、`waiting-1` / `waiting-full` / `waiting-bots` / `waiting-guest` / `waiting-spec`。参数：`n` 人数、`v` 视角、`bots` / `auto` / `offline` 座位、`spec=1`（`all=1` 看底牌）、`t` 倒计时毫秒（`none` 不显示）、`chat=1`、`live=1`（别人由人机走、系统自动翻）、`emotes=p2:laugh,p3:skull`（每 2 秒冒气泡）、`rematch=1`、`lc=1`、`hint=1`（操作面板显示 `botHint` 的理由）。
+- **键盘**：1–5 选手牌、回车盖 / 叫 / 丢、←/→ 调叫价、P 过、空格继续、Esc 取消选择。页面在后台、轮到你时标题前面加「【轮到你】」。
+- **提示**：`GameBoard` 的 `hint` 属性显示一句提示（教程的「提示」按钮用 `botHint(view, me)` 的 `reason`）；正式对局没有传。
+- 截图量化脚本：`~/projects/qa-reports/tools/skull-scenes.sh`（预览页场景 × 四种尺寸 × 两套主题）、`skull-play.mjs`（网页上真打一整局）。
+
 ## 目录
 
 | 位置 | 内容 |
@@ -267,6 +290,6 @@ const game = buildGame({
 | `packages/game/src/roomTypes.ts` | 房间协议（人数、开房选项、表情） |
 | `packages/game/test/` | 规则书用例、随机对局、隐藏信息、预览局面的测试；`test/acceptance/` 归规则核对，引擎不改 |
 | `apps/server/` | Socket.IO 房间服务器和测试 |
-| `apps/web/` | 网页（现在是调试牌桌） |
+| `apps/web/` | 网页（首页、等候房间、牌桌、预览页），见「界面」一节 |
 | `scripts/test-bot.mjs`、`scripts/spy.mjs` | 陪玩脚本、抓包脚本 |
 | `art/` | 美术规格、占位图、出图脚本（美术阶段负责） |

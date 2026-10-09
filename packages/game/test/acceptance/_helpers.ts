@@ -6,7 +6,12 @@ import { expect } from "vitest";
 import {
   advanceWith,
   apply,
+  createGame,
   createRng,
+  legalActions,
+  previewPlayers,
+  timeoutTurn,
+  waitingFor,
   discCount,
   findPlayer,
   needsAdvance,
@@ -118,10 +123,10 @@ export function otherIds(full: GameState, viewer: string): string[] {
  * - 别人板上没翻开的：没有 id、没有牌面（碟子除外）；翻开的：牌面和真实一致，没有 id；
  * - 别人的 lost（失掉的牌面）不下发；事件里别人的 DiscLost 不带 face；
  * - 自己的垫子 id、牌面完整。
- * 返回发现的问题（空 = 没问题）。viewer 为 "" 表示观战。
+ * 返回发现的问题（空 = 没问题）。viewer 为 "" 表示观战。viewOverride 只给检查器自检用（喂一个没裁剪的状态，必须报错）。
  */
-export function viewProblems(full: GameState, viewer: string): string[] {
-  const view = redactGameForViewer(full, viewer);
+export function viewProblems(full: GameState, viewer: string, viewOverride?: GameState): string[] {
+  const view = viewOverride ?? redactGameForViewer(full, viewer);
   const out: string[] = [];
   const json = JSON.stringify(view);
   if ("seed" in view && view.seed !== undefined) out.push("下发了 seed");
@@ -162,4 +167,39 @@ export function viewProblems(full: GameState, viewer: string): string[] {
     if ("discId" in e) out.push(`事件 ${e.type} 带 discId`);
   }
   return out;
+}
+
+/**
+ * 随机打一局：每一步要么系统自动翻牌，要么从 waitingFor 里随机挑一个人、从他的 legalActions 里随机挑一条命令；
+ * timeoutRate 的概率改成「这一步到点」（timeoutTurn）。每一步之后调 onStep。返回终局状态和步数。
+ * 只用对外接口，自己判断有没有卡住（不靠引擎的不变量检查）。
+ */
+export function randomGame(
+  n: number,
+  seed: number,
+  opts: { lastChance?: boolean; timeoutRate?: number; maxSteps?: number },
+  onStep: (state: GameState, prev: GameState) => void,
+): { state: GameState; steps: number } {
+  const r = createRng(seed);
+  let g = createGame(previewPlayers(n), seed, { lastChance: opts.lastChance ?? false });
+  const max = opts.maxSteps ?? 5000;
+  let steps = 0;
+  while (g.phase !== "gameOver") {
+    if (++steps > max) throw new Error(`种子 ${seed}：${max} 步还没结束`);
+    const prev = g;
+    if (needsAdvance(g)) {
+      g = advanceWith(g, r).state;
+    } else if (r.next() < (opts.timeoutRate ?? 0)) {
+      g = timeoutTurn(g);
+    } else {
+      const waiting = waitingFor(g);
+      if (waiting.length === 0) throw new Error(`种子 ${seed}：${g.phase} 阶段没人要做决定，也不用系统自动翻（卡住）`);
+      const p = r.pick(waiting);
+      const acts = legalActions(g, p);
+      if (acts.length === 0) throw new Error(`种子 ${seed}：等 ${p} 做决定，但他没有合法行动（卡住）`);
+      g = apply(g, p, r.pick(acts), r).state;
+    }
+    onStep(g, prev);
+  }
+  return { state: g, steps };
 }

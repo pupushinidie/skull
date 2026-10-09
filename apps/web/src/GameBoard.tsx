@@ -474,6 +474,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
           label={label}
           tutorial={slot === "me" ? "my-mat" : `mat-${player.id}`}
           turnKey={turnKeys[player.id]}
+          emote={layout.scale < 3 || layout.mobile ? bubbles[player.id] : undefined}
         />
         <Plate
           name={player.name}
@@ -485,7 +486,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
           status={status}
           lastBid={lastBidOf(view, player.id)}
           shown={view.roundLog.reveals.find((reveal) => reveal.player === player.id)?.discs.map((disc) => (disc.lastChance ? "lc-up" : disc.face))}
-          emote={bubbles[player.id]}
+          emote={layout.scale >= 3 && !layout.mobile ? bubbles[player.id] : undefined}
           compact={layout.mobile}
           size={layout.scale}
           tutorial={slot === "me" ? "my-plate" : `plate-${player.id}`}

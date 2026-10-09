@@ -597,7 +597,7 @@ function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onK
                 <div className="player-row" key={member.id}>
                   <div className="player-avatar sk-member-avatar" style={{ "--seat": seatHex(index) } as CSSProperties}>
                     <img src={avatarArt(index)} alt="" width={32} height={32} />
-                    {bubbles[member.playerId] && <EmoteBubble key={bubbles[member.playerId]!.key} id={bubbles[member.playerId]!.id} />}
+                    {bubbles[member.playerId] && <EmoteBubble key={bubbles[member.playerId]!.key} id={bubbles[member.playerId]!.id} scale={1} />}
                   </div>
                   <div className="player-details">
                     <strong>{member.name}{member.id === socket.id ? <small>你</small> : null}</strong>

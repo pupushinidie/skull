@@ -93,7 +93,7 @@
 @keyframes sk-drop-in { from { transform: translate(-50%, -16px); } to { transform: translate(-50%, 0); } }
 
 .sk-stage .sk-table {
-  position: relative; z-index: 1; display: flex; flex: 1 1 auto; flex-direction: column; justify-content: space-between;
+  position: relative; display: flex; flex: 1 1 auto; flex-direction: column; justify-content: space-between;
   gap: var(--gap); min-height: 0; padding: var(--gap) 16px;
 }
 .sk-stage .sk-row-top { display: flex; align-items: flex-start; justify-content: space-evenly; gap: 16px; }
@@ -117,13 +117,16 @@
 .sk-stage .sk-stack-disc.peek { filter: brightness(0.6) saturate(0.7); }
 .sk-stage .sk-stack-disc.drop { animation: sk-drop 240ms steps(4) 1; }
 @keyframes sk-drop { from { transform: translateY(calc(-8px * var(--s))); } to { transform: none; } }
-.sk-stage .sk-mat.pushed-down { transform: translateY(calc(4px * var(--s))); filter: brightness(0.6); }
-.sk-stage .sk-mat.pushed-up { transform: translateY(calc(-4px * var(--s))); filter: brightness(0.6); }
-.sk-stage .sk-mat.pushed-left { transform: translateX(calc(-4px * var(--s))); filter: brightness(0.6); }
-.sk-stage .sk-mat.pushed-right { transform: translateX(calc(4px * var(--s))); filter: brightness(0.6); }
-.sk-stage .sk-mat.dim { filter: brightness(0.5) grayscale(0.4); }
+.sk-stage .sk-mat.pushed-down { transform: translateY(calc(4px * var(--s))); }
+.sk-stage .sk-mat.pushed-up { transform: translateY(calc(-4px * var(--s))); }
+.sk-stage .sk-mat.pushed-left { transform: translateX(calc(-4px * var(--s))); }
+.sk-stage .sk-mat.pushed-right { transform: translateX(calc(4px * var(--s))); }
+/* 压暗只压垫板和垫子，不压冒在上面的表情气泡 */
+.sk-stage .sk-mat[class*="pushed-"] > :is(.sk-mat-img, .sk-stack-disc) { filter: brightness(0.6); }
+.sk-stage .sk-mat.dim > :is(.sk-mat-img, .sk-stack-disc) { filter: brightness(0.5) grayscale(0.4); }
+.sk-stage .sk-mat[class*="pushed-"] > .sk-stack-disc.peek { filter: brightness(0.36) saturate(0.7); }
 .sk-stage .sk-mat.glow { cursor: pointer; outline: calc(var(--px) * 2) solid #f0c050; outline-offset: 4px; animation: sk-glow 900ms steps(2, jump-none) infinite; }
-.sk-stage .sk-mat.glow[class*="pushed-"] { filter: none; }
+.sk-stage .sk-mat.glow[class*="pushed-"] > :is(.sk-mat-img, .sk-stack-disc) { filter: none; }
 .sk-stage .sk-mat.glow:hover { outline-color: #fff2b8; filter: brightness(1.15); }
 @keyframes sk-glow { 50% { outline-color: #b3821c; } }
 .sk-stage .sk-mat-label {
@@ -172,9 +175,15 @@
 /* 1024 那一档（2×）名牌收紧 */
 .sk-stage .sk-table[style*="--s: 2"] .sk-plate { gap: 4px; padding: 6px; }
 
-/* 表情气泡：冒在头像右上方 */
-.sk-bubble { position: absolute; z-index: 60; left: calc(100% - 12px); top: -4px; width: 80px; height: 88px; pointer-events: none; animation: sk-bubble-in 200ms steps(3) 1; }
+/* 表情气泡：从头像上冒出来（盖住头像、往上探），不挡名字后面的「板上 / 手里」数字；
+   1024 和手机名牌太矮，气泡冒在垫板上（垫子张数名牌上有数字） */
+.sk-bubble { position: absolute; z-index: 60; left: -8px; bottom: -4px; width: 80px; height: 88px; pointer-events: none; animation: sk-bubble-in 200ms steps(3) 1; }
 .sk-bubble > img { position: absolute; inset: 0; }
+.sk-stage .sk-mat .sk-bubble { left: 50%; bottom: -8px; margin-left: -40px; }
+.sk-bubble.small { width: 40px; height: 44px; }
+.sk-bubble.small .sk-bubble-emote { left: 4px; top: 4px; }
+.sk-stage .sk-mat .sk-bubble.small { bottom: 4px; margin-left: -20px; }
+.sk-member-avatar .sk-bubble { left: 4px; bottom: 2px; }
 .sk-bubble .sk-bubble-emote { position: absolute; left: 8px; top: 8px; }
 @keyframes sk-bubble-in { from { transform: translateY(12px); } to { transform: none; } }
 
@@ -334,9 +343,18 @@
 @media (max-width: 719px) {
   .sk-rules-body { grid-template-columns: 1fr; }
   .app-shell .sk-final { padding: 16px 12px; }
-  .sk-final-list li { grid-template-columns: 24px 32px minmax(0, 1fr); row-gap: 0; }
+  .sk-final-list li { grid-template-columns: 24px 32px minmax(0, 1fr) auto; row-gap: 0; }
+  .sk-final-name { grid-column: 3 / 5; }
   .sk-final-what { grid-column: 3; }
-  .sk-final-discs { grid-column: 3; }
+  .sk-final-discs { grid-column: 4; }
+  .app-shell .sk-final { max-height: calc(100dvh - 32px); overflow-y: auto; }
+  .sk-final-head .sk-icon { width: 48px; height: 48px; }
+  .sk-final-list { gap: 4px; }
+  .sk-final-list li { padding: 2px 6px; column-gap: 8px; }
+  .sk-final-name { line-height: 1.25; }
+  .sk-final-list li :is(.sk-final-what, .sk-final-discs) { line-height: 1.5; }
+  .app-shell .sk-final .sk-final-reason { margin: 6px 0; }
+  .sk-rematch { gap: 6px; margin-top: 8px; }
   .sk-final-list li .sk-final-what, .sk-final-list li.win .sk-final-what { font-size: 12px; }
 }
 
@@ -530,7 +548,7 @@
 .sk-mobile .sk-stage .sk-mat-label { bottom: -6px; padding: 0 4px; font-size: 12px; line-height: 18px; }
 .sk-mobile .sk-stage .sk-mat.glow { outline-offset: 2px; }
 .sk-mobile .sk-stage .sk-plate-out { font-size: 12px; }
-.sk-mobile .sk-bubble { left: 0; top: 0; }
+.sk-mobile .sk-stage .sk-table { padding-top: 16px; }
 .sk-screen.sk-mobile { height: auto; min-height: 100%; }
 .sk-screen.sk-mobile .sk-side { position: static; display: flex; width: auto; box-shadow: none; }
 .sk-mobile .sk-side { flex: 0 0 auto; padding: 8px; border-left: 0; border-top: var(--px) solid #4a2a1a; overflow: visible; }

@@ -89,7 +89,7 @@ export interface MatFx {
 
 export type PushDir = "down" | "up" | "left" | "right";
 
-export function Mat({ seat, flower, stack, scale, mine, fx = [], dropDepth, eliminated, pushed, dim, glow, onClick, label, tutorial, turnKey }: {
+export function Mat({ seat, flower, stack, scale, mine, fx = [], dropDepth, eliminated, pushed, dim, glow, onClick, label, tutorial, turnKey, emote }: {
   seat: number;
   flower: boolean;
   stack: readonly StackDisc[];
@@ -110,6 +110,8 @@ export function Mat({ seat, flower, stack, scale, mine, fx = [], dropDepth, elim
   tutorial?: string;
   /** 赢下一轮时翻面：key 变化时播一次。 */
   turnKey?: string | undefined;
+  /** 小倍数（1024、手机）时表情气泡冒在垫板上，不挡名牌上的数字。 */
+  emote?: { id: EmoteId; key: string } | undefined;
 }) {
   const s = scale;
   const flipping = new Map<number, MatFx>();
@@ -195,6 +197,7 @@ export function Mat({ seat, flower, stack, scale, mine, fx = [], dropDepth, elim
         }
       })}
       {glow && label && <span className="sk-mat-label">{label}</span>}
+      {emote && <EmoteBubble key={emote.key} id={emote.id} scale={s >= 2 ? 2 : 1} />}
     </Tag>
   );
 }
@@ -295,11 +298,11 @@ export function Plate({ name, seat, isMe, tags, onBoard, inHand, status, lastBid
 }
 
 /** 快捷表情气泡：奶白气泡 2× + 表情 2× 循环，2.4 秒后由上层收走。 */
-export function EmoteBubble({ id }: { id: EmoteId }) {
+export function EmoteBubble({ id, scale = 2 }: { id: EmoteId; scale?: number }) {
   return (
-    <span className="sk-bubble" role="img" aria-label={EMOTE_NAME[id]}>
-      <img src={uiArt("bubble")} width={80} height={88} alt="" draggable={false} />
-      <Sprite sheet={emoteSheet(id)} scale={2} mode="loop" frameMs={160} className="sk-bubble-emote" />
+    <span className={scale === 1 ? "sk-bubble small" : "sk-bubble"} role="img" aria-label={EMOTE_NAME[id]}>
+      <img src={uiArt("bubble")} width={40 * scale} height={44 * scale} alt="" draggable={false} />
+      <Sprite sheet={emoteSheet(id)} scale={scale} mode="loop" frameMs={160} className="sk-bubble-emote" />
     </span>
   );
 }

@@ -39,7 +39,7 @@ export function FinalDialog({ game, room, myId, spectating, onRematch, onLeave }
     <div className="gm-modal-backdrop sk-final-backdrop" role="presentation">
       <div className="sk-petals" aria-hidden="true">
         {[0, 1, 2, 3, 4].map((index) => (
-          <Sprite key={index} sheet={SHEETS.petals} scale={2} mode="loop" frameMs={120} delayMs={-index * 230} style={{ left: `${index * 22}%` }} />
+          <Sprite key={index} sheet={SHEETS.petals} scale={2} mode="loop" frameMs={120} delayMs={-index * 230} style={{ left: `calc((100% - 128px) * ${index / 4})` }} />
         ))}
       </div>
       <section className="gm-panel sk-final" role="dialog" aria-modal="true" aria-labelledby="sk-final-title" data-tutorial="final">

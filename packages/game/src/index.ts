@@ -54,3 +54,32 @@ export type {
   VoiceParticipant,
   VoiceSignal,
 } from "./roomTypes.js";
+export { checkInvariants, faceTotals } from "./invariants.js";
+export {
+  act,
+  autoFlip,
+  buildGame,
+  createScene,
+  discOf,
+  passAround,
+  PREVIEW_NAMES,
+  previewPlayers,
+  previewRoom,
+  runScript,
+  SCENE_NAMES,
+  SCENE_TITLES,
+  startGame,
+} from "./scenes.js";
+export type {
+  DiscSpec,
+  GameSpec,
+  PlayerSpec,
+  PreviewRoomOptions,
+  RoomFlags,
+  Scene,
+  SceneName,
+  SceneOptions,
+  ScriptStep,
+  StackSpec,
+  StartOptions,
+} from "./scenes.js";

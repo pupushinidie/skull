@@ -788,7 +788,7 @@ export function createGame(
     players: players.map((player, index) => ({
       id: player.id,
       name: player.name,
-      color: index,
+      seat: index,
       hand: rng.shuffle(faces).map((face) => ({ id: discId(rng, used), face })),
       stack: [],
       flowerUp: false,

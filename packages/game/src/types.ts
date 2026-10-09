@@ -77,8 +77,8 @@ export interface StackDisc extends Disc {
 export interface Player {
   readonly id: string;
   readonly name: string;
-  /** 座位色 0–5，按入座顺序；也是顺时针顺序。 */
-  readonly color: number;
+  /** 座位下标 0–5，按入座顺序（也是顺时针顺序）；美术的 mats/mat-{seat}-*.png、avatars/avatar-{seat}.png、座位色都按它取。 */
+  readonly seat: number;
   /** 手里没盖出去的垫子（含 Last Chance 碟）。 */
   hand: Disc[];
   /** 本轮盖在板上的垫子，从底到顶。 */

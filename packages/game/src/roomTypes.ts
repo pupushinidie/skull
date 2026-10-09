@@ -4,8 +4,8 @@ import type { GameCommand, GameOptions, GameState } from "./types.js";
 export const CAPACITY_OPTIONS = [3, 4, 5, 6] as const;
 export type Capacity = (typeof CAPACITY_OPTIONS)[number];
 
-/** 快捷表情（点一下在自己头像上冒出来，房间里的人包括观战都看得到）。具体画面归界面。 */
-export const EMOTE_IDS = ["rose", "skull", "taunt", "shrug", "think", "laugh"] as const;
+/** 快捷表情（点一下在自己头像上冒出来，房间里的人包括观战都看得到）。id 和美术规格 art/spec.md 4.6 一致，画面归界面。 */
+export const EMOTE_IDS = ["rose", "skull", "taunt", "shrug", "think", "laugh", "sweat", "shock"] as const;
 export type EmoteId = (typeof EMOTE_IDS)[number];
 /** 每个座位多久能发一次表情（毫秒）。 */
 export const EMOTE_COOLDOWN_MS = 2_000;

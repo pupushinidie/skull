@@ -793,3 +793,57 @@ export function previewRoom(source: Scene | GameState, options: PreviewRoomOptio
     game: options.spectator ? redactGameForViewer(game, "", { seeAll }) : redactGameForViewer(game, viewer),
   };
 }
+
+// ---------------------------------------------------------------- 5. 补充文件 2.3 的教程剧本（教程阶段可以直接用）
+
+/**
+ * 补充文件 2.3 推荐剧本（3 人：你 p1 + 咕噜一号 p2 + 咕噜二号 p3，你先手），按轮分好的剧本步骤。
+ * 用法：let game = startGame({ players: 3, first: "p1" }); for (const round of TUTORIAL_SCRIPT) game = runScript(game, round.steps);
+ * 每轮最后一步之后停在结算画面（第 4 轮是终局）；下一轮的第一步是 ["readyAll"]。
+ * 第 2 轮你翻到二号的骷髅，随机失牌固定丢一朵玫瑰（["p1", "flip", "p3", "rose"]）。
+ */
+export const TUTORIAL_SCRIPT: readonly { readonly round: number; readonly title: string; readonly steps: readonly ScriptStep[] }[] = [
+  {
+    round: 1,
+    title: "怎么赢一轮：总数 5，你加到 3，翻自己 2 朵再翻二号 1 朵",
+    steps: [
+      ["p1", "place", "rose"], ["p2", "place", "rose"], ["p3", "place", "rose"],
+      ["p1", "place", "rose"], ["p2", "place", "rose"], ["p3", "bid", 2],
+      ["p1", "bid", 3], ["p2", "pass"], ["p3", "pass"],
+      ["autoAll"], ["p1", "flip", "p3"],
+    ],
+  },
+  {
+    round: 2,
+    title: "失败的代价：各盖 1 张，你加到总数 3，翻到二号的骷髅，随机丢了一朵玫瑰",
+    steps: [
+      ["readyAll"],
+      ["p1", "place", "rose"], ["p2", "place", "rose"], ["p3", "place", "skull"],
+      ["p1", "bid", 1], ["p2", "bid", 2], ["p3", "pass"], ["p1", "bid", 3],
+      ["autoAll"], ["p1", "flip", "p2"], ["p1", "flip", "p3", "rose"],
+    ],
+  },
+  {
+    round: 3,
+    title: "骷髅怎么坑人：你底下骷髅上面玫瑰、开叫 1；一号加到 4，翻到你的骷髅",
+    steps: [
+      ["readyAll"],
+      ["p1", "place", "skull"], ["p2", "place", "rose"], ["p3", "place", "rose"],
+      ["p1", "place", "rose"], ["p2", "place", "rose"], ["p3", "place", "rose"],
+      ["p1", "bid", 1], ["p2", "bid", 4], ["p3", "pass"], ["p1", "pass"],
+      ["autoAll"], ["p2", "flip", "p1"], ["p2", "flip", "p1"],
+    ],
+  },
+  {
+    round: 4,
+    title: "赢下整局：一号先手，你板上 2 朵玫瑰、总数 8，开叫 2，大家 pass",
+    steps: [
+      ["readyAll"],
+      ["p1", "place", "rose"], ["p2", "place", "rose"], ["p3", "place", "rose"],
+      ["p2", "place", "rose"], ["p3", "place", "rose"], ["p1", "place", "rose"],
+      ["p2", "place", "rose"], ["p3", "place", "rose"],
+      ["p1", "bid", 2], ["p2", "pass"], ["p3", "pass"],
+      ["autoAll"],
+    ],
+  },
+];

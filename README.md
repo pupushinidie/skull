@@ -9,7 +9,7 @@
 ```bash
 npm install
 npm run dev          # 服务器 :3018，网页 :5191
-npm test             # 121 项：规则书和补充用例 56、3–6 人各 300 整局随机对局、隐藏信息 6、预览局面 33、服务器 21
+npm test             # 122 项：规则书和补充用例 56、3–6 人各 300 整局随机对局、隐藏信息 6、预览局面和教程剧本 34、服务器 21
 npm run typecheck    # 规则包、测试、服务器、网页
 BASE_PATH=/skull/ npm run build
 ```
@@ -225,7 +225,9 @@ const game = buildGame({
 | `eliminatedViewer` | 我已淘汰，看别人打 |
 | `laterRound` | 第 4 轮，有 3 轮历史记录 |
 
-**4. 包成房间快照**：`previewRoom(sceneOrGame, { viewer?, spectator?, spectatorsSeeAll?, offline?, auto?, bots?, turnRemainingMs?, rematch? })` 返回服务器会发给这个视角的 `LobbyRoomSnapshot`（游戏已裁剪；成员的连接 id 是 `sock-<座位>`，房主是 p1），预览页渲染真正的 GameBoard 用。
+**4. 教程剧本**：`TUTORIAL_SCRIPT` 是补充文件 2.3 的推荐剧本（3 人、你 p1 先手、四轮），按轮分好的 `ScriptStep[]`，从 `startGame({ players: 3, first: "p1" })` 起逐轮 `runScript` 就能走到终局（测试核对过总数 5 / 3 / 6 / 8 和失牌结果）。
+
+**5. 包成房间快照**：`previewRoom(sceneOrGame, { viewer?, spectator?, spectatorsSeeAll?, offline?, auto?, bots?, turnRemainingMs?, rematch? })` 返回服务器会发给这个视角的 `LobbyRoomSnapshot`（游戏已裁剪；成员的连接 id 是 `sock-<座位>`，房主是 p1），预览页渲染真正的 GameBoard 用。
 
 ### 房间事件（`roomTypes.ts`，比模板多的）
 

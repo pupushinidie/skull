@@ -233,3 +233,26 @@ describe("预览局面工厂：buildGame / runScript", () => {
     expect(game.round).toBe(2);
   });
 });
+
+describe("补充文件 2.3 教程剧本", () => {
+  it("四轮都能按剧本走完，数字和补充文件的核对一致（总数 5 / 3 / 6 / 8，失牌后剩 3 张，最后赢下整局）", async () => {
+    const { TUTORIAL_SCRIPT } = await import("../src/scenes.js");
+    const { totalDiscsInPlay } = await import("../src/engine.js");
+    let game = startGame({ players: 3, first: "p1" });
+    const totals: number[] = [];
+    for (const round of TUTORIAL_SCRIPT) {
+      for (const step of round.steps) {
+        game = runScript(game, [step]);
+        if (game.phase === "resolving" && game.roundLog.flips.length === 0) totals.push(totalDiscsInPlay(game));
+      }
+      expect(checkInvariants(game)).toEqual([]);
+      expect(game.round).toBe(round.round);
+    }
+    expect(totals).toEqual([5, 3, 6, 8]);
+    expect(game.history.map((log) => [log.challenger, log.result])).toEqual([["p1", "success"], ["p1", "fail"], ["p2", "fail"]]);
+    expect(game.history[1]!.loss).toMatchObject({ player: "p1", method: "random" });
+    expect(P(game, "p1").lost).toEqual(["rose"]);
+    expect(game.history[2]!.nextFirst).toBe("p2");
+    expect(game.result).toEqual({ winner: "p1", reason: "twoWins" });
+  });
+});

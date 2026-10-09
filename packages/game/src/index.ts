@@ -69,6 +69,7 @@ export {
   SCENE_NAMES,
   SCENE_TITLES,
   startGame,
+  TUTORIAL_SCRIPT,
 } from "./scenes.js";
 export type {
   DiscSpec,

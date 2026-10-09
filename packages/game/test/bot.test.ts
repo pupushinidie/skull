@@ -7,7 +7,7 @@ import { BOT_PARAMS, botCommand, botDecision, botHint } from "../src/bot.js";
 import { boardRisks, bestAllocation } from "../src/bot-knowledge.js";
 import { newRoundLog, redactGameForViewer } from "../src/engine.js";
 import { createRng } from "../src/rng.js";
-import { buildGame, type GameSpec } from "../src/scenes.js";
+import { buildGame, type GameSpec, type PlayerSpec } from "../src/scenes.js";
 import type { GameState, RoundLog } from "../src/types.js";
 
 const fixed = (value: number) => () => value;
@@ -342,12 +342,10 @@ describe("拦截领先者", () => {
   });
 
   it("花面的人叫到自己板上的全部（他多半翻得过）：平时不够门槛也要加注拦他", () => {
+    const me: PlayerSpec = { stack: ["rose"], hand: [], lost: ["rose", "rose", "skull"] };
+    const third: PlayerSpec = { stack: ["rose"] };
     const spec: GameSpec = {
-      players: [
-        { stack: ["rose"], hand: [], lost: ["rose", "rose", "skull"] },
-        { stack: ["rose", "rose", "rose", "skull"], flowerUp: true },
-        { stack: ["rose"] },
-      ],
+      players: [me, { stack: ["rose", "rose", "rose", "skull"], flowerUp: true }, third],
       phase: "bidding",
       firstPlayer: "p2",
       bids: [{ type: "open", player: "p2", count: 4 }, { type: "pass", player: "p3" }],
@@ -357,7 +355,7 @@ describe("拦截领先者", () => {
     expect(command).toEqual({ type: "raise", count: 5 });
     expect(reason).toMatch(/拦住/);
     // 同样的局面但他没花面：门槛 0.8 不够，pass
-    const calm = decide({ ...spec, players: [spec.players[0]!, { stack: ["rose", "rose", "rose", "skull"] }, spec.players[2]!] } as GameSpec);
+    const calm = decide({ ...spec, players: [me, { stack: ["rose", "rose", "rose", "skull"] }, third] });
     expect(calm.command).toEqual({ type: "pass" });
   });
 

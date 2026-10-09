@@ -55,6 +55,8 @@ process.env.BOT_DELAY_SCALE = "0";
 process.env.TURN_MS = "300";
 process.env.FLIP_MS = "0";
 process.env.ROUND_END_MS = "300";
+// 对局中所有真人都离线多久后关房（默认 2 分钟，测试调短）
+process.env.ROOM_ABANDON_MS = "600";
 
 
 type TestSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -212,6 +214,27 @@ describe("人机", () => {
     expect((await call<void>((ack) => host.emit("room:leave", ack))).ok).toBe(true);
     expect((await lobby(host)).some((candidate) => candidate.players.some((player) => player.name === hostName))).toBe(false);
   });
+
+  it("对局中唯一的真人离开，只剩人机的房间到时自动关掉（人机不会自己一直打下去）", async () => {
+    const host = await connect();
+    const hostName = nick("独走");
+    await create(host, hostName, MIN_CAPACITY);
+    await addBotsUpTo(host, 1);
+    expect((await start(host)).ok).toBe(true);
+    expect((await lobby(host)).some((candidate) => candidate.players[0]?.name === hostName)).toBe(true);
+    host.disconnect();
+    const watcher = await connect();
+    const deadline = Date.now() + 5_000;
+    let gone = false;
+    while (Date.now() < deadline) {
+      if (!(await lobby(watcher)).some((candidate) => candidate.players.some((player) => player.name === hostName))) {
+        gone = true;
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    expect(gone).toBe(true);
+  }, 15_000);
 
   it("连续超时两次转托管，由人机代打；取消托管后交还", async () => {
     const idle = await connect();

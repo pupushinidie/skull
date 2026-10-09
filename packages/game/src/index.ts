@@ -29,7 +29,8 @@ export {
   waitingFor,
 } from "./engine.js";
 export type { NewPlayer, RedactOptions } from "./engine.js";
-export { botCommand } from "./bot.js";
+export { BOT_PARAMS, botCommand, botDecision, botHint } from "./bot.js";
+export type { BotDecision, BotParams } from "./bot.js";
 export { createRng, scriptedRng } from "./rng.js";
 export type { Rng } from "./rng.js";
 export { CAPACITY_OPTIONS, DEFAULT_ROOM_ACCESS, EMOTE_COOLDOWN_MS, EMOTE_IDS } from "./roomTypes.js";

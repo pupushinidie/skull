@@ -221,3 +221,36 @@ if __name__ == "__main__":
             v.save(OUT / "discs" / f"code-{k}.png") if (OUT / "discs").exists() else None
         preview({"code": s}, "code")
         print("ok")
+
+
+# ---------------------------------------------------------------- PixelLab 候选 → 统一轮廓 + 代码厚度
+def from_candidate(cand: Image.Image, kind: str, dx: int = 0, dy: int = 0) -> Image.Image:
+    """候选（32×32 俯视的圆垫子）→ 32×36：轮廓强制成同一个圆（R_OUT），外面剪掉、缺的用最近的颜色补，
+    一圈 1px 描边重画；下面 4 行厚度用 rim(kind) 的侧面。这样五种面的外形、描边、厚度逐像素一致。"""
+    from pix import harden
+    cand = harden(cand)
+    b = cand.getchannel("A").getbbox()
+    src = cand.crop(b)
+    layer = Image.new("RGBA", (W, FACE), CLEAR)
+    layer.alpha_composite(src, ((W - src.width) // 2 + dx, (FACE - src.height) // 2 + dy))
+    lp = layer.load()
+    # 候选自己的描边（很暗的一圈）先去掉，换成里面一圈的颜色
+    def dark(c):
+        return c[3] and (c[0] + c[1] + c[2]) < 120
+    base, _ = rim(kind)
+    out = base.copy()
+    op = out.load()
+    face = face_mask(0)
+    edge = {p for p in face if any((p[0] + a, p[1] + c) not in face for a, c in ((1, 0), (-1, 0), (0, 1), (0, -1)))}
+    opaque = [(x, y) for y in range(FACE) for x in range(W) if lp[x, y][3] and not dark(lp[x, y])]
+    for (x, y) in face:
+        if (x, y) in edge:
+            op[x, y] = rgba("ink")
+            continue
+        c = lp[x, y] if y < FACE else (0, 0, 0, 0)
+        if not c[3] or (dark(c) and math.hypot(x + 0.5 - CX, y + 0.5 - CY) > R_OUT - 2.5):
+            # 补：找最近的不透明、非描边像素
+            nx, ny = min(opaque, key=lambda p: (p[0] - x) ** 2 + (p[1] - y) ** 2)
+            c = lp[nx, ny]
+        op[x, y] = c
+    return out

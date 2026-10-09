@@ -191,3 +191,24 @@ def showcase(im: Image.Image, scale: int = 4, extra_scales=(1,)) -> Image.Image:
             out.alpha_composite(s, (x, row * h + pad))
             x += s.width + pad
     return out
+
+
+def gif(sheet: Image.Image, n: int, path, scale: int = 4, ms=120, bg=NIGHT_BG, hold_last: int = 0, day: bool = True) -> None:
+    """横排精灵图 → GIF 预览（夜间底；day=True 时右边并排一份白天底）。ms 可以是每帧时长的列表。"""
+    frames = frames_of(sheet.convert("RGBA"), n)
+    out = []
+    for f in frames:
+        big = up(f, scale)
+        w = big.width * (2 if day else 1) + (12 if day else 0)
+        canvas = Image.new("RGBA", (w + 16, big.height + 16), rgba(bg))
+        canvas.alpha_composite(big, (8, 8))
+        if day:
+            d = Image.new("RGBA", (big.width + 8, big.height + 16), rgba(DAY_BG))
+            canvas.paste(d, (big.width + 16, 0))
+            canvas.alpha_composite(big, (big.width + 20, 8))
+        out.append(canvas.convert("RGB").convert("P", palette=Image.ADAPTIVE, colors=255))
+    durs = ms if isinstance(ms, list) else [ms] * n
+    if hold_last:
+        durs = list(durs)
+        durs[-1] = hold_last
+    out[0].save(path, save_all=True, append_images=out[1:], duration=durs, loop=0, disposal=2)

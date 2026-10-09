@@ -129,6 +129,129 @@ def add_badge(mat: Image.Image, seat: int, x: int = 3, y: int | None = None) -> 
     b = badge(seat)
     out = mat.copy()
     if y is None:
-        y = mat.height - 4 - b.height
+        y = mat.height - 22  # 左边、左下角玫瑰的上面（花面四角有玫瑰）
     out.alpha_composite(b, (x, y))
     return out
+
+
+# ---------------------------------------------------------------- 代码画的垫板（备选 + PixelLab 的 init_image）
+import math as _m
+import random as _r
+
+from pix import CLEAR as _CLEAR, outline as _outline
+
+
+def _rr(w, h, r):
+    pts = set()
+    for y in range(h):
+        for x in range(w):
+            cx = min(max(x + 0.5, r), w - r)
+            cy = min(max(y + 0.5, r), h - r)
+            if _m.hypot(x + 0.5 - cx, y + 0.5 - cy) <= r:
+                pts.add((x, y))
+    return pts
+
+
+ROSE7 = [
+    ".ooo.",
+    "oLRDo",
+    "oRDRo",
+    "oDRDo",
+    ".ooo.",
+]
+ROSE_SM = [
+    "..ooo..",
+    ".oLLRo.",
+    "oLRDDRo",
+    "oRDRRDo",
+    "oDRRDDo",
+    ".oDDDo.",
+    "oGoooGo",
+    ".oGoGo.",
+    "..ooo..",
+]
+ROSE_LEG = {"o": "#1e0d0b", "L": "#e85a48", "R": "#c8352b", "D": "#8f1f1c", "G": "#4f8a32"}
+
+
+def code_mat(flower: bool, seat: int = 0, w: int = 56, h: int = 64, seed: int = 3) -> Image.Image:
+    """皮垫板：圆角、左上亮右下暗、细微皮纹和划痕、一圈虚线缝线（座位亮色）；花面加金线刺绣边、四角玫瑰、中间暗纹玫瑰。"""
+    _, hexc, leather = SEATS[seat]
+    dark, main, light = (rgba(c) for c in leather)
+    rnd = _r.Random(seed)
+    shape = _rr(w, h, 4.5)
+    im = Image.new("RGBA", (w, h), _CLEAR)
+    px = im.load()
+    for (x, y) in shape:
+        # 左上亮、右下暗的大渐变 + 皮纹噪点
+        t = (x / w + y / h) / 2
+        c = mix(light, main, min(1, t * 1.6)) if t < 0.6 else mix(main, dark, (t - 0.6) / 0.4 * 0.7)
+        n = rnd.random()
+        if n < 0.08:
+            c = mix(c, dark, 0.35)
+        elif n > 0.95:
+            c = mix(c, light, 0.4)
+        px[x, y] = c
+    # 几道浅浅的折痕
+    for _ in range(3):
+        x0, y0 = rnd.randint(8, w - 8), rnd.randint(8, h - 8)
+        ang = rnd.uniform(0, _m.pi)
+        for k in range(rnd.randint(5, 10)):
+            x, y = int(x0 + k * _m.cos(ang)), int(y0 + k * _m.sin(ang))
+            if (x, y) in shape:
+                px[x, y] = mix(px[x, y], dark, 0.45)
+                if (x + 1, y) in shape:
+                    px[x + 1, y] = mix(px[x + 1, y], light, 0.25)
+    # 外沿：描边 + 内侧一圈暗边（厚度感）
+    for (x, y) in shape:
+        if any((x + a, y + b) not in shape for a, b in ((1, 0), (-1, 0), (0, 1), (0, -1))):
+            px[x, y] = rgba("ink")
+        elif any((x + a, y + b) not in shape for a, b in ((2, 0), (0, 2))):
+            px[x, y] = mix(px[x, y], dark, 0.6)
+        elif any((x + a, y + b) not in shape for a, b in ((-2, 0), (0, -2))):
+            px[x, y] = mix(px[x, y], light, 0.35)
+    # 缝线：离边 3px 的一圈虚线
+    seam = []
+    for x in range(5, w - 5):
+        seam += [(x, 3), (x, h - 4)]
+    for y in range(5, h - 5):
+        seam += [(3, y), (w - 4, y)]
+    for (x, y) in seam:
+        if (x + y) % 3 != 0:
+            px[x, y] = rgba(hexc)
+            # 缝线下面一点阴影
+            if (x + 1, y + 1) in shape and (x + 1, y + 1) not in seam:
+                px[x + 1, y + 1] = mix(px[x + 1, y + 1], dark, 0.5)
+    if flower:
+        gold, gold_d, gold_h = rgba("#e8b661"), rgba("#9a6a24"), rgba("#fbe3a0")
+        # 金线刺绣边：离边 5px 一圈实线 + 每隔 4px 一个小结
+        for x in range(7, w - 7):
+            for y in (5, h - 6):
+                px[x, y] = gold if x % 4 else gold_h
+                px[x, y + 1] = gold_d
+        for y in range(7, h - 7):
+            for x in (5, w - 6):
+                px[x, y] = gold if y % 4 else gold_h
+                px[x + 1, y] = gold_d
+        # 中间暗纹大玫瑰（浮雕：只用皮革的暗、亮）
+        cx, cy = w / 2, h / 2
+        for y in range(h):
+            for x in range(w):
+                d = _m.hypot(x + 0.5 - cx, y + 0.5 - cy)
+                a = _m.atan2(y + 0.5 - cy, x + 0.5 - cx)
+                if d < 12 and (x, y) in shape:
+                    # 螺旋花瓣的线
+                    if abs(((d - 2.2 * a) % 4.0) - 2) < 0.5 or 11 < d < 12:
+                        px[x, y] = mix(px[x, y], dark, 0.55)
+                    elif abs(((d - 2.2 * a) % 4.0) - 1) < 0.5:
+                        px[x, y] = mix(px[x, y], light, 0.25)
+        # 左右两边各一朵小玫瑰（被 5 张垫子盖住中间时也露得出来）
+        rose = ascii_img(ROSE_SM, ROSE_LEG)
+        for (x, y) in ((1, h // 2 - 4), (w - 8, h // 2 - 4)):
+            pass
+        corner = ascii_img(ROSE_SM, ROSE_LEG)
+        for (x, y) in ((2, 2), (w - 9, 2), (2, h - 11), (w - 9, h - 11)):
+            im.alpha_composite(corner, (x, y))
+        side = ascii_img(ROSE7, ROSE_LEG)
+        for (x, y) in ((3, h // 2 - 2), (w - 8, h // 2 - 2)):
+            im.alpha_composite(side, (x, y))
+    return im

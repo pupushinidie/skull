@@ -1,0 +1,18 @@
+{"time": "2026-10-09 17:56:18", "name": "disc-back", "endpoint": "/generate-image-v2", "usage": {"type": "usd", "usd": 0.08}, "seconds": 2323.8, "status": "completed"}
+{"time": "2026-10-09 17:58:45", "name": "disc-rose", "endpoint": "/generate-image-v2", "usage": {"type": "usd", "usd": 0.08}, "seconds": 147.4, "status": "completed"}
+{"time": "2026-10-09 18:01:56", "name": "disc-skull", "endpoint": "/generate-image-v2", "usage": {"type": "usd", "usd": 0.08}, "seconds": 191.2, "status": "completed"}
+{"time": "2026-10-09 18:04:31", "name": "disc-lc", "endpoint": "/generate-image-v2", "usage": {"type": "usd", "usd": 0.08}, "seconds": 155.1, "status": "completed"}
+{"time": "2026-10-09 19:08:51", "name": "mat-blank-s501", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006925325552622478}, "seconds": 3859.5}
+{"time": "2026-10-09 19:09:26", "name": "mat-blank-s502", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006581637726889716}, "seconds": 35.0}
+{"time": "2026-10-09 19:09:59", "name": "mat-blank-s503", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006648555861579047}, "seconds": 33.4}
+{"time": "2026-10-09 19:10:42", "name": "mat-flower-s501", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.0071939385467105444}, "seconds": 43.0}
+{"time": "2026-10-09 19:11:34", "name": "mat-flower-s502", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.008195237000783284}, "seconds": 52.1}
+{"time": "2026-10-09 19:12:22", "name": "mat-flower-s503", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.007692270861731635}, "seconds": 47.9}
+{"time": "2026-10-09 19:12:58", "name": "mat2-blank-s511", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006564288457234701}, "seconds": 36.1}
+{"time": "2026-10-09 19:13:31", "name": "mat2-blank-s512", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006809394386079576}, "seconds": 33.0}
+{"time": "2026-10-09 19:14:13", "name": "mat2-blank-s513", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.007376830286449856}, "seconds": 42.2}
+{"time": "2026-10-09 19:14:48", "name": "mat2-flower-s511", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006674456569883558}, "seconds": 35.0}
+{"time": "2026-10-09 19:15:21", "name": "mat2-flower-s512", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.006634454276826646}, "seconds": 32.7}
+{"time": "2026-10-09 19:16:12", "name": "mat2-flower-s513", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.007716105116738214}, "seconds": 50.7}
+{"time": "2026-10-09 19:17:24", "name": "night-a-s4301", "endpoint": "/create-image-pixen", "usage": {"type": "usd", "usd": 0.01071030722724067}, "seconds": 72.0}
+{"time": "2026-10-09 19:18:32", "name": "night-a-s4302", "endpoint": "/create-image-pixen", "usage": {"type": "usd", "usd": 0.010052963627709282}, "seconds": 68.0}

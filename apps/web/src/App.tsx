@@ -10,6 +10,10 @@ import RoomChat from "./RoomChat.js";
 import { roomRole, RoomSettingsPanel, SeatSwitch } from "./RoomExtras.js";
 import { socket } from "./socket.js";
 import { ThemeToggle, useTheme } from "./theme.js";
+import { GAME_ID } from "./tutorial/hints.js";
+import { TutorialInvite } from "./tutorial/Invite.js";
+import { readTutorial } from "./tutorial/storage.js";
+import TutorialMode from "./tutorial/TutorialMode.js";
 import { useVoice } from "./voice.js";
 
 type EntryMode = "create" | "join";
@@ -43,6 +47,26 @@ function App() {
   // 观战时从谁的座位看（默认第一位玩家）。
   const [watchId, setWatchId] = useState("");
   const voice = useVoice(room);
+  // 新手教程：首页或等候房间点进来（地址带 ?tutorial 时直接打开，游戏中心可以直接链过来）
+  const [tutorialOpen, setTutorialOpen] = useState(() => new URLSearchParams(window.location.search).has("tutorial"));
+
+  function closeTutorial() {
+    setTutorialOpen(false);
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("tutorial")) {
+      params.delete("tutorial");
+      const query = params.toString();
+      window.history.replaceState(null, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+    }
+  }
+
+  // 在等候房间里看教程时，房主一开局就回到牌桌（不然这一步会超时、转成托管）
+  useEffect(() => {
+    if (tutorialOpen && room?.status === "playing") {
+      closeTutorial();
+      setNotice("对局开始了，教程先停在这里。");
+    }
+  }, [tutorialOpen, room?.status]);
 
   // 在房间里时服务端不推送在线牌桌列表；回到首页时主动拉一次最新的。
   useEffect(() => {
@@ -216,6 +240,14 @@ function App() {
     }
   }
 
+  if (tutorialOpen && room?.status !== "playing") {
+    return (
+      <main className="app-shell sk-game tut-on">
+        <TutorialMode name={name} brand={<Brand />} themeToggle={themeToggle} theme={theme} waitingRoom={room?.code} onExit={closeTutorial} />
+      </main>
+    );
+  }
+
   if (room?.status === "playing" && room.game) {
     const players = room.game.players;
     const watched = players.some((player) => player.id === watchId) ? watchId : players[0]!.id;
@@ -261,6 +293,7 @@ function App() {
         onAddBot={addBot}
         onDissolve={dissolveRoom}
         dialog={confirmDialog}
+        onTutorial={() => setTutorialOpen(true)}
       />
     );
   }
@@ -286,6 +319,7 @@ function App() {
       onSubmit={handleSubmit}
       lobbyRooms={lobbyRooms}
       onJoinListed={joinListed}
+      onTutorial={() => setTutorialOpen(true)}
     />
   );
 }
@@ -312,6 +346,8 @@ export interface HomeScreenProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   lobbyRooms: PublicRoomSummary[];
   onJoinListed: (roomId: string, spectate: boolean) => void;
+  /** 打开新手教程（预览页不传就不显示入口）。 */
+  onTutorial?: () => void;
 }
 
 export function HomeScreen(props: HomeScreenProps) {
@@ -341,6 +377,15 @@ export function HomeScreen(props: HomeScreenProps) {
             <li><Icon name="bell" scale={2} /><b>叫</b>叫个数：我能连翻这么多张都是玫瑰</li>
             <li><DiscImg face="skull" scale={1} /><b>翻</b>先翻自己的，再翻别人的，碰到骷髅就输</li>
           </ul>
+          {props.onTutorial && (
+            <TutorialInvite
+              record={readTutorial(GAME_ID)}
+              title="第一次玩？3 分钟学会"
+              text="咕噜嘎在真牌桌上带你打一局，学完和人机练一局。"
+              again="再看一遍新手教程"
+              onOpen={props.onTutorial}
+            />
+          )}
           <div className="sk-hero" style={{ backgroundImage: `url(${heroArt})` }} role="img" aria-label="皮垫板上一摞黄铜垫子，旁边一朵玫瑰、一个骷髅" />
         </div>
 
@@ -475,6 +520,8 @@ export interface RoomScreenProps {
   onAddBot: () => void;
   onDissolve: () => void;
   dialog?: ReactNode;
+  /** 打开新手教程（不离开房间；预览页不传就不显示入口）。 */
+  onTutorial?: () => void;
 }
 
 export function RoomScreen(props: RoomScreenProps) {
@@ -522,7 +569,7 @@ function useRoomEmotes() {
   return bubbles;
 }
 
-function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onKick, onAddBot, onDissolve, chat }: RoomScreenProps) {
+function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onKick, onAddBot, onDissolve, chat, onTutorial }: RoomScreenProps) {
   const { isHost, spectating } = roomRole(room);
   const openSeats = Math.max(0, room.capacity - room.members.length);
   const bubbles = useRoomEmotes();
@@ -585,6 +632,15 @@ function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onK
                 <span>成功两次就赢，丢光出局</span>
               </div>
             </div>
+            {onTutorial && !spectating && (
+              <TutorialInvite
+                record={readTutorial(GAME_ID)}
+                title="等人的时候，先学一下？"
+                text="咕噜嘎带你在真牌桌上打一局。不会离开房间，房主一开局就自动回来。"
+                again="再看一遍新手教程（不离开房间）"
+                onOpen={onTutorial}
+              />
+            )}
           </section>
 
           <section className="room-panel player-panel">

@@ -36,6 +36,9 @@ import { DiscImg, FLIP_MS, Icon, Mat, Plate, Sprite, Thinking, type MatFx, type 
 import { GameRoomMenu, SpectateBar } from "./RoomExtras.js";
 import { socket } from "./socket.js";
 import type { Theme } from "./theme.js";
+import { Coach, TipToast } from "./tutorial/Coach.js";
+import { detectTips, GAME_ID, hintFor, TIPS, type Hint } from "./tutorial/hints.js";
+import { useFirstTimeTips } from "./tutorial/tips.js";
 
 interface GameBoardProps {
   readonly room: LobbyRoomSnapshot;
@@ -60,6 +63,14 @@ interface GameBoardProps {
   readonly onLeave: () => void;
   /** 人机给的一句提示（人机阶段的「理由」接口出来后接上；没有就不显示）。 */
   readonly hint?: string | undefined;
+  /** 自己在 room.members 里的 id；默认是 socket.id（新手教程不连服务器，传固定值）。 */
+  readonly selfMemberId?: string;
+  /**
+   * online：真实对局（只有自己和人机时能看「提示」，第一次遇到某条规则时弹小贴士）；
+   * tutorial：新手教程的剧本进行中（咕噜嘎在讲，不出提示和小贴士）；
+   * practice：教程后的练习局（随时能看提示）。
+   */
+  readonly mode?: "online" | "tutorial" | "practice";
 }
 
 const PHASE_NAME: Record<Phase, string> = {
@@ -134,9 +145,9 @@ function useTimers() {
 type FxMap = Record<string, MatFx[]>;
 type Spot = { owner: string; face: "rose" | "skull" | "lc"; fast: boolean; key: number };
 
-function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, theme, chat, onCommand, onRematch, onAuto, onDissolve, watchId, onWatch, onLeave, hint }: GameBoardProps) {
+function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, theme, chat, onCommand, onRematch, onAuto, onDissolve, watchId, onWatch, onLeave, hint, selfMemberId, mode = "online" }: GameBoardProps) {
   const game = room.game!;
-  const member = room.members.find((candidate) => candidate.id === socket.id);
+  const member = room.members.find((candidate) => candidate.id === (selfMemberId ?? socket.id));
   const spectating = !member;
   const selfId = spectating ? "" : member.playerId;
   const viewId = spectating ? watchId : selfId;
@@ -378,28 +389,54 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   const [bubbles, setBubbles] = useState<Record<string, { id: EmoteId; key: string }>>({});
   const [emoteError, setEmoteError] = useState("");
   const [cooling, setCooling] = useState(false);
-  useEffect(() => {
-    const handle = (emote: EmoteBroadcast) => {
-      const key = `${emote.from}-${emote.at}-${Math.random()}`;
-      setBubbles((current) => ({ ...current, [emote.from]: { id: emote.id, key } }));
-      later(2400, () => setBubbles((current) => {
-        if (current[emote.from]?.key !== key) return current;
-        const next = { ...current };
-        delete next[emote.from];
-        return next;
-      }));
-    };
-    socket.on("room:emote", handle);
-    return () => { socket.off("room:emote", handle); };
+  const showBubble = useCallback((emote: EmoteBroadcast) => {
+    const key = `${emote.from}-${emote.at}-${Math.random()}`;
+    setBubbles((current) => ({ ...current, [emote.from]: { id: emote.id, key } }));
+    later(2400, () => setBubbles((current) => {
+      if (current[emote.from]?.key !== key) return current;
+      const next = { ...current };
+      delete next[emote.from];
+      return next;
+    }));
   }, [later]);
+  useEffect(() => {
+    socket.on("room:emote", showBubble);
+    return () => { socket.off("room:emote", showBubble); };
+  }, [showBubble]);
   const sendEmote = useCallback((id: EmoteId) => {
     setCooling(true);
     later(EMOTE_COOLDOWN_MS, () => setCooling(false));
+    // 新手教程 / 练习局不连服务器：直接在自己头像上冒泡
+    if (mode !== "online") {
+      showBubble({ id, from: selfId, name: member?.name ?? "", at: Date.now() });
+      return;
+    }
     socket.emit("room:emote", { id }, (response) => {
       setEmoteError(response.ok ? "" : response.error);
       if (!response.ok) later(2400, () => setEmoteError(""));
     });
-  }, [later]);
+  }, [later, mode, showBubble, selfId, member?.name]);
+
+  /* ---------- 「提示」和「第一次」小贴士（新手教程那一套） ---------- */
+  // 提示：练习局随时能用；真实对局里只有自己和人机时能用（有别的真人就不显示）
+  const botsOnly = room.members.length > 1 && room.members.every((candidate) => candidate.playerId === selfId || candidate.bot === true);
+  const canHint = !spectating && !autoPlaying && myTurn && (mode === "practice" || (mode === "online" && botsOnly));
+  const [hintShown, setHintShown] = useState<{ version: number; hint: Hint } | null>(null);
+  const shownHint = hintShown && hintShown.version === game.version && canHint ? hintShown.hint : null;
+  const toggleHint = useCallback(() => {
+    setHintShown((current) => (current && current.version === game.version ? null : { version: game.version, hint: hintFor(game, selfId) }));
+  }, [game, selfId]);
+  useEffect(() => {
+    if (!canHint) return;
+    const handle = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.metaKey || event.ctrlKey || event.altKey || target?.closest("input, textarea, [contenteditable]")) return;
+      if (event.key === "h" || event.key === "H") toggleHint();
+    };
+    window.addEventListener("keydown", handle);
+    return () => window.removeEventListener("keydown", handle);
+  }, [canHint, toggleHint]);
+  const tips = useFirstTimeTips(GAME_ID, game.version, () => detectTips(game, selfId), TIPS, mode === "online" && !spectating);
 
   /* ---------- 排版 ---------- */
   const [tableRef, tableSize] = useElementSize<HTMLDivElement>();
@@ -696,6 +733,11 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
         <section className={["sk-stage", shake ? "shake" : ""].filter(Boolean).join(" ")} style={stageStyle}>
           <div className={["sk-prompt", prompt.mine ? "mine" : "", timerShown && secondsLeft! <= 5 ? "urgent" : ""].filter(Boolean).join(" ")} role="status" data-tutorial="prompt">
             <span className="sk-prompt-text">{prompt.text}</span>
+            {canHint && (
+              <button className={shownHint ? "quiet-button sk-hint-button on" : "quiet-button sk-hint-button"} type="button" data-tutorial="hint-button" onClick={toggleHint}>
+                提示{!layout.mobile && <kbd>H</kbd>}
+              </button>
+            )}
             {timerShown && <b className="sk-timer" data-tutorial="timer" title="剩余秒数，到时系统替你做">{secondsLeft}</b>}
           </div>
           {(error || shownNotice) && <p className={error ? "sk-feedback error" : "sk-feedback"} role={error ? "alert" : "status"}>{error || shownNotice}</p>}
@@ -731,6 +773,20 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
       {view.phase === "gameOver" && finalReady && (
         <FinalDialog game={view} room={room} myId={selfId} spectating={spectating} onRematch={onRematch} onLeave={onLeave} />
       )}
+      {shownHint && (
+        <Coach
+          view={{
+            key: `hint-${game.version}`,
+            say: shownHint.say,
+            ...(shownHint.note ? { note: shownHint.note } : {}),
+            anchor: shownHint.anchor,
+            focus: false,
+            face: "think",
+            actions: <button className="quiet-button" type="button" onClick={() => setHintShown(null)}>知道了</button>,
+          }}
+        />
+      )}
+      {tips.tip && <TipToast tip={tips.tip} onClose={tips.dismiss} onNever={tips.never} />}
     </div>
   );
 }

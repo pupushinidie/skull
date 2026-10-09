@@ -1,0 +1,55 @@
+/*
+ * 骷髅牌自己的教程样式（共用的 tutorial.css 之外）：侧栏的教程进度、提示条上的「提示」按钮、教程里侧栏的挤法。
+ * 不进 day-palette.ts 的 files：颜色都用 .app-shell 上的变量，白天版自动跟着换。
+ */
+
+/* 侧栏（聊天的位置）里的教程进度 */
+.sk-tut-progress { display: grid; gap: 6px; }
+.sk-tut-progress h3 small { margin-left: 6px; color: var(--muted); font-size: 12px; }
+.sk-tut-progress ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.app-shell .sk-tut-progress .sk-tut-exit { justify-self: start; width: auto; margin: 0; padding: 2px 12px; font-size: 12px; }
+
+/* 顶栏「退出教程」不折行 */
+.app-shell .tut-exit { white-space: nowrap; }
+
+/* 提示条上的「提示」按钮（练习局、只有自己和人机的房间） */
+.app-shell .sk-hint-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  min-height: 0;
+  margin: 0 0 0 12px;
+  padding: 0 10px;
+  font-size: 12px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+.app-shell .sk-hint-button kbd { padding: 0 4px; color: var(--muted); background: rgba(0, 0, 0, 0.3); font: inherit; font-size: 12px; }
+.app-shell .sk-hint-button.on { color: #ffd77a; box-shadow: 0 0 0 var(--px) #070302, inset 0 0 0 var(--px) #f0c050; }
+
+/* 剧本进行中咕噜嘎会讲每一步：记录只留最近几条，侧栏让给教程进度 */
+.tut-script .sk-log li:nth-child(n + 5) { display: none; }
+.tut-practice .sk-log li:nth-child(n + 9) { display: none; }
+
+/* 矮屏（平板横屏 1024×690 这类）：对话框收紧一点 */
+@media (max-height: 720px) and (min-width: 521px) {
+  .tut-dock { gap: 12px; padding: 8px 14px 8px; }
+  .tut-dock .tut-portrait { --gp: 2px; }
+  .tut-dock .tut-foot { margin-top: 4px; }
+  .tut-dock .tut-say { line-height: 1.3; }
+  .tut-dock .tut-note { margin-top: 2px; line-height: 1.5; }
+  .app-shell .tut-dock .tut-actions .tut-main { padding: 2px 14px; }
+}
+
+/* 手机：进度格子缩小排成一行，「跳过教程」不折行，对话框矮一点 */
+@media (max-width: 520px) {
+  .tut-dock .tut-pips { gap: 2px; }
+  .tut-dock .tut-pips i { width: 4px; height: 4px; }
+  .tut-dock .tut-foot { margin-top: 6px; gap: 6px 10px; }
+  .tut-dock .tut-foot-left { gap: 10px; }
+  .tut-link { white-space: nowrap; }
+  .tut-dock .tut-say { line-height: 1.3; }
+  .tut-dock .tut-note { line-height: 1.5; }
+}

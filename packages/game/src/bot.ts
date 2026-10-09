@@ -158,7 +158,7 @@ function bidPlan(ctx: Ctx, b: number): string {
   return ctx.know.opponents
     .map((opponent, index) => ({ opponent, k: take[index] ?? 0 }))
     .filter((entry) => entry.k > 0)
-    .map((entry) => ` ${entry.opponent.name} ${entry.k} 张`)
+    .map((entry) => `${entry.opponent.name} ${entry.k} 张`)
     .join("、");
 }
 
@@ -324,11 +324,11 @@ function decideBidding(ctx: Ctx): BotDecision {
       const target = stretch >= bid + 2 && random() < params.interceptJump ? stretch : bid + 1;
       return {
         command: { type: "raise", count: target },
-        reason: `${leader.name} 已经花面，大家都 pass 他就可能赢整局（他翻得过的可能约 ${pct(q)}）；加到 ${target} 拦住他（你的成功率约 ${pct(bidChance(ctx, target))}）。`,
+        reason: `${leader.name}已经花面，大家都 pass 他就可能赢整局（他翻得过的可能约 ${pct(q)}）；加到 ${target} 拦住他（你的成功率约 ${pct(bidChance(ctx, target))}）。`,
       };
     }
     if (ctx.skullDepth > 0 && q < 0.25) {
-      return { command: { type: "pass" }, reason: `${leader.name} 已经花面，但他要翻够 ${bid} 张多半得翻到你的骷髅，pass，让他来踩。` };
+      return { command: { type: "pass" }, reason: `${leader.name}已经花面，但他要翻够 ${bid} 张多半得翻到你的骷髅，pass，让他来踩。` };
     }
   }
   const next = bid + 1;
@@ -336,11 +336,13 @@ function decideBidding(ctx: Ctx): BotDecision {
     return { command: { type: "pass" }, reason: `再加就要翻到你自己的骷髅（从顶往下第 ${ctx.skullDepth} 张），pass。` };
   }
   const p = bidChance(ctx, next);
-  const deep = know.opponents.find(
-    (opponent) => opponent.risks.length > 0 && opponent.risks.length <= 2 && safeTop(opponent.risks, opponent.risks.length) < 0.6,
-  );
+  let deep: OpponentInfo | undefined;
+  if (ctx.skullDepth === 0 && next > ctx.me.stack.length && next <= know.total) {
+    const { take } = bestAllocation(know.opponents.map((opponent) => opponent.risks), next - ctx.me.stack.length);
+    deep = know.opponents.find((opponent, index) => opponent.risks.length >= 2 && take[index] === opponent.risks.length);
+  }
   const reason = deep
-    ? `再加到 ${next} 成功率只有约 ${pct(p)}，就得去翻 ${deep.name} 板底那张了，风险太大，pass。`
+    ? `再加到 ${next} 成功率只有约 ${pct(p)}，就得翻到${deep.name}板底那张了，风险太大，pass。`
     : `再加到 ${next} 成功率只有约 ${pct(p)}，不划算，pass。`;
   return { command: { type: "pass" }, reason };
 }
@@ -363,11 +365,11 @@ function decideFlip(ctx: Ctx): BotDecision | null {
   const { opponent, value, top } = best!;
   const allNeeded = boards.reduce((sum, candidate) => sum + candidate.risks.length, 0) === x;
   let reason: string;
-  if (opponent.isLastChance[0]) reason = `${opponent.name} 顶上是 Last Chance 碟，明牌玫瑰，白送一张，先翻它。`;
-  else if (allNeeded) reason = `剩下的每张都得翻，先翻风险最低的：${opponent.name} 顶上那张（是骷髅的可能约 ${pct(top)}）。`;
-  else if (opponent.claim > 0) reason = `${opponent.name} 叫到过 ${opponent.claim}，他顶上的多半是玫瑰，先翻他的（这样翻完的成功率约 ${pct(value)}）。`;
-  else if (opponent.risks.length === 1) reason = `${opponent.name} 板上只剩 1 张没翻，翻他的，不用往别人板底下挖（成功率约 ${pct(value)}）。`;
-  else reason = `先翻 ${opponent.name} 顶上那张：是骷髅的可能约 ${pct(top)}；宁可每块板翻顶上的，也别往一块板底下挖。`;
+  if (opponent.isLastChance[0]) reason = `${opponent.name}顶上是 Last Chance 碟，明牌玫瑰，白送一张，先翻它。`;
+  else if (allNeeded) reason = `剩下的每张都得翻，先翻风险最低的：${opponent.name}顶上那张（是骷髅的可能约 ${pct(top)}）。`;
+  else if (opponent.claim > opponent.player.stack.filter((disc) => disc.revealed).length) reason = `${opponent.name}叫到过 ${opponent.claim}，他顶上的多半是玫瑰，先翻他的（这样翻完的成功率约 ${pct(value)}）。`;
+  else if (opponent.risks.length === 1) reason = `${opponent.name}板上只剩 1 张没翻，翻他的，不用往别人板底下挖（成功率约 ${pct(value)}）。`;
+  else reason = `先翻${opponent.name}顶上那张：是骷髅的可能约 ${pct(top)}；宁可每块板翻顶上的，也别往一块板底下挖。`;
   return { command: { type: "flipMat", player: opponent.id }, reason };
 }
 
@@ -403,7 +405,7 @@ function decideChooseFirst(ctx: Ctx): BotDecision | null {
   const score = (player: Player) => (player.flowerUp ? 10 : 0) + discCount(player);
   let pick = order[0]!;
   for (const player of order) if (score(player) < score(pick)) pick = player;
-  const why = pick.flowerUp ? "大家都已经花面了，按顺序" : `${pick.name} 还没赢过、垫子也最少`;
+  const why = pick.flowerUp ? "大家都已经花面了，按顺序" : `${pick.name}还没赢过、垫子也最少`;
   return {
     command: { type: "chooseFirstPlayer", player: pick.id },
     reason: `先手第一个就能开叫，给领先的人等于帮他；${why}，让他先手。`,

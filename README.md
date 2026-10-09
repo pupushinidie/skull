@@ -9,7 +9,7 @@
 ```bash
 npm install
 npm run dev          # 服务器 :3018，网页 :5191
-npm test
+npm test             # 121 项：规则书和补充用例 56、3–6 人各 300 整局随机对局、隐藏信息 6、预览局面 33、服务器 21
 npm run typecheck    # 规则包、测试、服务器、网页
 BASE_PATH=/skull/ npm run build
 ```
@@ -26,6 +26,7 @@ BASE_PATH=/skull/ npm run build
 - `node scripts/test-bot.mjs join <房间码> [昵称]`：以一个脚本玩家的身份加入别人的房间。
 - `BOT_DELAY_MS` 调思考时间（默认 1200），`BOT_IDLE=1` 只挂着不动（等超时），`SERVER_URL` 换服务器地址，`LAST_CHANCE=1` 建房时打开 Last Chance 碟。
 - `node scripts/spy.mjs [人数] [局数]`：抓包。两个 socket 当玩家、一个观战，连上 dev 服务器打完整局，逐条检查发给 B 和观战的数据里有没有别人的牌面、垫子 id、种子、失牌结果，有问题退出码 1。
+- 两个脚本共用 `scripts/policy.mjs` 里的简单打法（不是人机，只求各种行动都走到）。
 - 网页上的牌桌现在是**调试牌桌**（`apps/web/src/GameBoard.tsx`：把状态列出来，每个合法行动一个按钮），正式牌桌由界面阶段来做。
 
 ## 规则（用自己的话说）

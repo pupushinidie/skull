@@ -567,15 +567,22 @@ function runBot(room: RoomState, playerId: string, key: string): void {
   }
   // 托管、离线的真人由人机代打时绝不替他亮牌
   if (command?.type === "revealStack" && member?.bot !== true) command = { type: "nextRound" };
-  if (!command || !legalActions(game, playerId).some((action) => sameCommand(action, command!))) {
-    command = timeoutCommand(game, playerId, createRng(Math.floor(Math.random() * 2 ** 32)));
-  }
+  const fallback = () => timeoutCommand(game, playerId, createRng(Math.floor(Math.random() * 2 ** 32)));
+  if (!command || !legalActions(game, playerId).some((action) => sameCommand(action, command!))) command = fallback();
   if (!command) return;
   try {
     room.game = applyCommand(game, playerId, command);
   } catch (error) {
-    console.error("人机行动失败", error);
-    return;
+    // 人机给的动作执行出错：退回超时动作，不能让这一步卡住（只剩人机要动时没有截止时间）
+    console.error("人机行动失败，改用超时动作", error);
+    const backup = fallback();
+    if (!backup) return;
+    try {
+      room.game = applyCommand(game, playerId, backup);
+    } catch (fallbackError) {
+      console.error("超时动作也失败", fallbackError);
+      return;
+    }
   }
   afterGameChange(room);
   emitRoomUpdate(room);

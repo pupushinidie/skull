@@ -625,7 +625,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
     const base = promptText(view, selfId, spectating, nameOf);
     if (spectating) prompt = { text: `观战中 · ${base.text}`, mine: false };
     else if (autoPlaying && view.phase !== "gameOver") prompt = { text: "托管中：人机在替你走", mine: false };
-    else if (me?.eliminated && view.phase !== "gameOver" && !myTurn) prompt = { text: `你已出局 · ${base.text}`, mine: false };
+    else if (me?.eliminated && view.phase !== "gameOver" && !myTurn) prompt = { text: base.text, mine: false };
     else prompt = base;
     const turnMember = view.turn && view.turn !== selfId ? memberOf(view.turn) : undefined;
     if (turnMember && !turnMember.bot && (!turnMember.connected || turnMember.auto) && ["placeOrBid", "bidding", "resolving", "loseChoosing", "chooseFirst"].includes(view.phase)) {

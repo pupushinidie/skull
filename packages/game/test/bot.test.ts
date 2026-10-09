@@ -9,6 +9,7 @@ import { newRoundLog, redactGameForViewer } from "../src/engine.js";
 import { createRng } from "../src/rng.js";
 import { buildGame, type GameSpec, type PlayerSpec } from "../src/scenes.js";
 import type { GameState, RoundLog } from "../src/types.js";
+import { EXPLOITER, POLICIES, match } from "./bot-harness.js";
 
 const fixed = (value: number) => () => value;
 /** random 一直返回 0.99：所有「小概率换个打法」都不触发。 */
@@ -179,22 +180,27 @@ describe("每个阶段都会走", () => {
     expect(reason).toMatch(/自己的骷髅/);
   });
 
-  it("蠢错 1：板上有骷髅时，无论现价多少，开叫 / 加注的数永远 ≤ 骷髅深度 − 1", () => {
+  it("蠢错 1：板上有骷髅时，叫到含骷髅那层只能是明说的「冒险唬人」，而且只在剩 ≥ 3 张、不叫到场上总数时；提示（random=0.99）从不唬人", () => {
     for (const stack of [["skull", "rose", "rose"], ["rose", "skull", "rose"], ["skull", "rose"]] as const) {
       const depth = [...stack].reverse().indexOf("skull") + 1;
-      for (let bid = 0; bid <= 3; bid += 1) {
-        const spec: GameSpec = bid === 0
-          ? { players: [{ stack: [...stack] }, { stack: ["rose", "rose"] }, { stack: ["rose", "rose"] }, { stack: ["rose"] }] }
-          : {
-              players: [{ stack: [...stack] }, { stack: ["rose", "rose"] }, { stack: ["rose", "rose"] }, { stack: ["rose"] }],
-              phase: "bidding",
-              bids: [{ type: "open", player: "p2", count: bid }],
-              turn: "p1",
-            };
-        for (let seed = 1; seed <= 20; seed += 1) {
-          const rng = createRng(seed);
-          const { command } = decide(spec, "p1", () => rng.next());
-          if (command.type === "openBid" || command.type === "raise") expect(command.count).toBeLessThanOrEqual(depth - 1);
+      for (const lost of [[], ["rose"], ["rose", "rose"]] as ("rose")[][]) {
+        if (stack.length + lost.length > 4) continue;
+        for (let bid = 0; bid <= 3; bid += 1) {
+          const players: PlayerSpec[] = [{ stack: [...stack], lost }, { stack: ["rose", "rose"] }, { stack: ["rose", "rose"] }, { stack: ["rose"] }];
+          const spec: GameSpec = bid === 0 ? { players } : { players, phase: "bidding", bids: [{ type: "open", player: "p2", count: bid }], turn: "p1" };
+          const game = buildGame(spec);
+          const discs = 4 - lost.length;
+          for (let seed = 1; seed <= 30; seed += 1) {
+            const rng = createRng(seed);
+            const { command, reason } = botDecision(view(game), "p1", () => rng.next())!;
+            if ((command.type === "openBid" || command.type === "raise") && command.count >= depth) {
+              expect(reason).toMatch(/冒险唬人/);
+              expect(discs).toBeGreaterThanOrEqual(3);
+              expect(command.count).toBeLessThan(stack.length + 5);
+            }
+          }
+          const hint = botHint(view(game), "p1", steady)!;
+          if (hint.command.type === "openBid" || hint.command.type === "raise") expect(hint.command.count).toBeLessThanOrEqual(depth - 1);
         }
       }
     }
@@ -418,4 +424,72 @@ describe("快捷表情（提议，服务器默认没接）", () => {
     expect(["skull", "taunt"]).toContain(botEmote(trapped, "p1", fixed(0)));
     expect(botEmote(trapped, "p3", fixed(0))).toBeNull();
   });
+});
+
+describe("混合打法（第 2 轮）：靠随机数，不让人摸透", () => {
+  it("冒险唬人开叫：底下骷髅上面 1 张玫瑰、剩 4 张 → 有时开叫 2（含骷髅那层），理由说清是冒险", () => {
+    const spec: GameSpec = { players: [{ stack: ["skull", "rose"] }, { stack: ["rose"] }, { stack: ["rose"] }] };
+    const values = [0.99, 0];
+    let index = 0;
+    const bluff = decide(spec, "p1", () => values[index++] ?? 0);
+    expect(bluff.command).toEqual({ type: "openBid", count: 2 });
+    expect(bluff.reason).toMatch(/冒险唬人.*丢一张/);
+    expect(decide(spec, "p1", steady).command).toEqual({ type: "openBid", count: 1 });
+  });
+
+  it("只剩 2 张时从不唬人叫价（丢一张太疼）", () => {
+    const spec: GameSpec = { players: [{ stack: ["skull", "rose"], lost: ["rose", "rose"] }, { stack: ["rose"] }, { stack: ["rose"] }] };
+    expect(decide(spec, "p1", fixed(0)).command).toEqual({ type: "openBid", count: 1 });
+  });
+
+  it("冒险唬人加注：会翻到自己骷髅、但还有 2 个对手没 pass → 有时再加 1；只剩 1 个对手没 pass 时不唬", () => {
+    const players: PlayerSpec[] = [{ stack: ["skull", "rose"] }, { stack: ["rose", "rose"] }, { stack: ["rose", "rose"] }, { stack: ["rose"] }];
+    const open: GameSpec = { players, phase: "bidding", bids: [{ type: "open", player: "p2", count: 1 }], turn: "p1", firstPlayer: "p2" };
+    const bluff = decide(open, "p1", fixed(0));
+    expect(bluff.command).toEqual({ type: "raise", count: 2 });
+    expect(bluff.reason).toMatch(/冒险唬人/);
+    const lonely: GameSpec = {
+      players,
+      phase: "bidding",
+      firstPlayer: "p2",
+      bids: [{ type: "open", player: "p2", count: 1 }, { type: "pass", player: "p3" }, { type: "pass", player: "p4" }],
+      turn: "p1",
+    };
+    expect(decide(lonely, "p1", fixed(0)).command).toEqual({ type: "pass" });
+  });
+
+  it("骷髅不总在最底：板上全玫瑰、手里有骷髅还有玫瑰时，有时决策回合才盖骷髅；手里只剩骷髅时不盖（蠢错 4）", () => {
+    const late = decide({ players: [{ stack: ["rose"] }, { stack: ["rose"] }, { stack: ["rose"] }] }, "p1", fixed(0));
+    expect(late.command.type).toBe("placeDisc");
+    expect(late.game.players[0]!.hand.find((disc) => disc.id === (late.command as { discId: string }).discId)!.face).toBe("skull");
+    expect(late.reason).toMatch(/盖在中间/);
+    const onlySkull = decide({ players: [{ stack: ["rose", "rose", "rose"], hand: ["skull"] }, { stack: ["rose"] }, { stack: ["rose"] }] }, "p1", fixed(0));
+    expect(onlySkull.command.type).toBe("openBid");
+  });
+
+  it("骷髅在顶上时下一步一定先盖玫瑰把它盖住，不开叫", () => {
+    for (const value of [0, 0.5, 0.99]) {
+      const { game, command } = decide({ players: [{ stack: ["rose", "skull"] }, { stack: ["rose"] }, { stack: ["rose"] }] }, "p1", fixed(value));
+      expect(command.type).toBe("placeDisc");
+      expect(game.players[0]!.hand.find((disc) => disc.id === (command as { discId: string }).discId)!.face).toBe("rose");
+    }
+  });
+
+  it("装弱：板上 3 张玫瑰，有时只叫 1 或 2（理由写明装弱）", () => {
+    const spec: GameSpec = { players: [{ stack: ["rose", "rose", "rose"], hand: ["skull"] }, { stack: ["rose"] }, { stack: ["rose"] }] };
+    const weak = decide(spec, "p1", fixed(0));
+    expect(weak.command.type).toBe("openBid");
+    expect((weak.command as { count: number }).count).toBeLessThan(3);
+    expect(weak.reason).toMatch(/装弱/);
+  });
+
+  it("剥削者占不到新版的便宜：同样 400 局，新版人机对剥削者的胜率明显高于旧版（3、4 人局合计）", () => {
+    let legacy = 0;
+    let fresh = 0;
+    for (const seats of [3, 4]) {
+      legacy += match(POLICIES.legacy, EXPLOITER, 400, seats, 28000 + seats, "half", true).winRate;
+      fresh += match(POLICIES.bot, EXPLOITER, 400, seats, 28000 + seats, "half", true).winRate;
+    }
+    expect(fresh - legacy).toBeGreaterThan(0.06);
+  }, 60_000);
 });

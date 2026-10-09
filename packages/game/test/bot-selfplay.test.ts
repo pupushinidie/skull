@@ -18,14 +18,23 @@ function checkedBot(problems: string[]): Policy {
     const self = view.players.find((player) => player.id === me)!;
     if (!reason || /undefined|NaN/.test(reason)) problems.push(`理由不对：${reason}`);
     const depth = ownSkullDepth(self);
+    const total = view.players.reduce((sum, player) => sum + player.stack.length, 0);
+    const discs = [...self.hand, ...self.stack].filter((disc) => !disc.lastChance).length;
     if ((command.type === "openBid" || command.type === "raise") && depth > 0 && command.count >= depth) {
       const forced = command.type === "openBid" && self.hand.length === 0 && depth === 1 && command.count === 1;
-      if (!forced) problems.push(`蠢错 1：骷髅在第 ${depth} 张还叫 ${command.count}`);
+      const bluff = /冒险唬人/.test(reason) && discs >= 3 && command.count < total;
+      if (!forced && !bluff) problems.push(`蠢错 1：骷髅在第 ${depth} 张还叫 ${command.count}（${reason}）`);
     }
+    if ((command.type === "openBid" || command.type === "raise") && command.count === total && depth > 0) problems.push("蠢错 2：板上有骷髅还叫到场上总数");
     if (command.type === "placeDisc" && self.stack.length > 0) {
       const disc = self.hand.find((candidate) => candidate.id === command.discId);
-      if (disc?.face === "skull" && !disc.lastChance) problems.push("蠢错 4：把骷髅叠到自己板上的垫子上");
+      const rosesLeft = self.hand.filter((candidate) => candidate.face === "rose" && candidate.id !== command.discId && !candidate.lastChance).length;
+      if (disc?.face === "skull" && !disc.lastChance && (rosesLeft === 0 || !/盖在中间/.test(reason))) problems.push("蠢错 4：把骷髅叠到自己玫瑰上又没法盖住");
     }
+    if (depth === 1 && self.hand.some((disc) => disc.face === "rose") && command.type === "openBid") problems.push("蠢错 4：骷髅在顶上、手里还有玫瑰却去开叫");
+    // 给真人的提示（random=0.99）从不唬人、不装弱
+    const hint = botDecision(view, me, () => 0.99);
+    if (hint && /冒险唬人|装弱|盖在中间/.test(hint.reason)) problems.push(`提示教人冒险：${hint.reason}`);
     if (command.type === "loseDisc" && self.hand.filter((disc) => !disc.lastChance).length === 2) {
       const disc = self.hand.find((candidate) => candidate.id === command.discId);
       if (disc?.face !== "skull") problems.push("蠢错 3：2→1 失牌留了骷髅");

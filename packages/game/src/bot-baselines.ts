@@ -2,7 +2,10 @@
  * 测人机强度用的三个基线策略（补充文件 1.11）。只拿 redactGameForViewer 的视角，不从 index 导出。
  * - B0 随机：所有合法行动里随机（盖/开叫各一半、加注/pass 各一半，数字均匀）；
  * - B1 老实人：有玫瑰就盖玫瑰、从不主动盖骷髅；板上玫瑰 ≥ 2 或手里没玫瑰了就开叫自己板上的玫瑰数；只加注到自己板上的玫瑰数；翻板随机；失牌先丢骷髅；
- * - B2 固定概率贪心：每张对手垫子固定风险 0.25（同一块板相加）、门槛固定 0.5、准备阶段 25% 盖骷髅，其余照人机的打法。
+ * - B2 固定概率贪心：每张对手垫子固定风险 0.25（同一块板相加）、门槛固定 0.5、准备阶段 25% 盖骷髅，其余照人机的打法；
+ * - 旧版人机（第 1 轮）：现在的人机关掉混合打法（骷髅只在准备阶段盖、叫价永远是真的）；
+ * - 剥削者：知道旧版人机的全部破绽（人机板上只有最底那张可能是骷髅、人机叫过的层数一定是玫瑰），专门翻人机的顶层、相信人机的叫价；
+ *   其余照旧版人机打。只用来量「新版还会不会被这样剥削」。
  */
 import { BOT_PARAMS, botCommand, botDecision, type BotParams } from "./bot.js";
 import { legalActions } from "./engine.js";
@@ -62,6 +65,23 @@ export function honestPolicy(view: GameState, me: string, random: Random = Math.
   }
 }
 
+/** 混合打法全关（第 1 轮的人机就是这样）。 */
+const NO_MIX = { ...BOT_PARAMS.mix, skullLate: 0, bluffOpen: 0, bluffRaise: 0, slowOpen: 0, slowPass: 0 };
+
+/** 第 1 轮旧版人机的参数。 */
+export const LEGACY_PARAMS: BotParams = { ...BOT_PARAMS, mix: NO_MIX };
+
+/** 旧版人机。 */
+export function legacyPolicy(view: GameState, me: string, random: Random = Math.random): GameCommand | null {
+  return botDecision(view, me, random, LEGACY_PARAMS)?.command ?? null;
+}
+
+/** 剥削者：target 是人机的座位 id（真人看得到「人机」标签，知道谁是人机）。 */
+export function exploiterPolicy(target: string): (view: GameState, me: string, random?: Random) => GameCommand | null {
+  const params: BotParams = { ...LEGACY_PARAMS, exploitTarget: target };
+  return (view, me, random = Math.random) => botDecision(view, me, random, params)?.command ?? null;
+}
+
 /** B2 用的参数：固定风险、固定门槛、不看历史、准备阶段固定 25% 盖骷髅。 */
 export const GREEDY_PARAMS: BotParams = {
   ...BOT_PARAMS,
@@ -76,6 +96,7 @@ export const GREEDY_PARAMS: BotParams = {
   interceptMinDiscs: 2,
   risk: { ...BOT_PARAMS.risk, fixed: 0.25 },
   history: { ...BOT_PARAMS.history, enabled: false },
+  mix: NO_MIX,
 };
 
 /** B2 固定概率贪心。 */

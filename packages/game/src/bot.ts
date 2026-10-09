@@ -61,6 +61,32 @@ export const BOT_PARAMS = {
    */
   jumpFlower: 1,
   jumpProb: 0.8,
+  /**
+   * 混合打法（第 2 轮加的，防止被真人摸透）：全靠随机数，不看任何隐藏信息。每项是「基础概率」，实际概率 = 基础 × 局面系数：
+   * - skullLate：板上全是玫瑰、手里有骷髅且盖完还留着玫瑰时，决策回合把骷髅盖上去（骷髅不总在最底，之后再盖玫瑰把它盖住）；
+   * - bluffOpen：骷髅上面有玫瑰、本来要开叫「骷髅上面那几张」时，改成开叫到含骷髅那层（装作整块板都是玫瑰）；
+   * - bluffRaise：加注时本来因为会翻到自己骷髅要 pass，改成再加 1（还有 ≥ 2 个对手没 pass、加完不到场上总数时才考虑）；
+   * - slowOpen：板上 ≥ 2 张玫瑰、本来稳开叫自己张数时，故意叫低一点（装弱）；
+   * - slowPass：能加注时偶尔 pass（装弱；没人花面、自己没花面时才考虑）。
+   * 局面系数：唬人叫价按自己剩几张（bluffDiscs，剩 2 张以下不唬，丢一张太疼）；盖骷髅按 lateDiscs；
+   * 自己花面（差一胜）× selfFlower；有对手花面 × oppFlower（逼他加注来踩）；每多一个存活对手（3 人以上）+ perPlayer（人越多越可能有人往上加）。
+   * 唬人叫价一旦大家都 pass，自己就得翻到自己的骷髅、丢一张；期望是靠「有人加注来翻」赚回来：自对弈里对随机 / 老实人 / 贪心的胜率基本不变，
+   * 而专门剥削旧版破绽的对手（剥削者基线）明显占不到便宜了，数字见 README。
+   */
+  mix: {
+    skullLate: 0.08,
+    bluffOpen: 0.85,
+    bluffRaise: 0.8,
+    slowOpen: 0.06,
+    slowPass: 0.02,
+    bluffDiscs: { 4: 1, 3: 0.6, 2: 0, 1: 0 } as Record<number, number>,
+    lateDiscs: { 4: 1, 3: 0.7, 2: 0.4, 1: 0 } as Record<number, number>,
+    selfFlower: 0.5,
+    oppFlower: 1.3,
+    perPlayer: 0.1,
+  },
+  /** 测强度用：剥削者基线把这个座位当成旧版人机来读（人机自己永远是 null）。 */
+  exploitTarget: null as string | null,
   risk: {
     mBase: 0.3,
     mStep: 0.15,
@@ -123,13 +149,29 @@ interface Ctx {
 }
 
 function makeCtx(view: GameState, me: string, params: BotParams, random: () => number): Ctx {
-  const know = buildKnowledge(view, me, params.risk, params.history);
+  const know = buildKnowledge(view, me, params.risk, params.history, params.exploitTarget);
   const self = know.me;
   const myDiscs = discCount(self);
   const lastChance = meHoldsLastChance(view, self);
   const base = params.thresholds[Math.min(4, Math.max(1, myDiscs))] ?? 0.5;
   const theta = lastChance ? params.lastChanceTheta : base - (self.flowerUp ? params.flowerUpBonus : 0);
   return { view, me: self, know, params, random, myDiscs, lastChance, skullDepth: ownSkullDepth(self), theta };
+}
+
+/** 混合打法这一下的实际概率 = 基础 × 局面系数，最多 0.9（永远留着不唬的可能；提示按钮传 0.99 时也就永远不唬）。 */
+function mixChance(ctx: Ctx, base: number, discsTable: Record<number, number>): number {
+  return base > 0 ? Math.min(0.9, base * mixScale(ctx, discsTable)) : 0;
+}
+
+/** 混合打法的局面系数（见 BOT_PARAMS.mix）。 */
+function mixScale(ctx: Ctx, discsTable: Record<number, number>): number {
+  const { mix } = ctx.params;
+  if (ctx.lastChance) return 0;
+  let scale = discsTable[Math.min(4, Math.max(1, ctx.myDiscs))] ?? 0;
+  if (ctx.me.flowerUp) scale *= mix.selfFlower;
+  if (ctx.know.opponents.some((opponent) => opponent.player.flowerUp)) scale *= mix.oppFlower;
+  scale *= 1 + mix.perPlayer * Math.max(0, ctx.know.alive - 3);
+  return scale;
 }
 
 /** 叫 b 能翻满的概率（我来当挑战者）。 */
@@ -248,6 +290,12 @@ function decidePlaceOrBid(ctx: Ctx): BotDecision {
       if (roses.length > 0 && random() < params.baitMore) {
         return { command: { type: "placeDisc", discId: roses[0]!.id! }, reason: "骷髅上面再叠一张玫瑰：诱饵更像真的，你能稳叫的数也多一张。" };
       }
+      if (d < know.total && random() < mixChance(ctx, params.mix.bluffOpen, params.mix.bluffDiscs)) {
+        return openBid(
+          d,
+          `冒险唬人：你从顶往下第 ${d} 张是骷髅，照样开叫 ${d}，装作整块板都是玫瑰。谁想加注就得来翻你、多半踩到骷髅；可要是大家都 pass，你会翻到自己的骷髅、丢一张。`,
+        );
+      }
       return openBid(k, `你底下盖的是骷髅、上面 ${k} 张玫瑰：开叫 ${k}，被放过就赢；有人加注就可能踩到你的骷髅。千万别叫到 ${d}。`);
     }
     if (roses.length > 0) {
@@ -257,10 +305,20 @@ function decidePlaceOrBid(ctx: Ctx): BotDecision {
   }
 
   // 板上全是玫瑰
+  if (skull && roses.length >= 1 && s >= 1 && random() < mixChance(ctx, params.mix.skullLate, params.mix.lateDiscs)) {
+    return {
+      command: { type: "placeDisc", discId: skull.id! },
+      reason: "这次把骷髅盖在中间、不放最底下：别人以为骷髅总在最底，翻你上面几张就会踩到。下次轮到你再盖一张玫瑰把它盖住。",
+    };
+  }
   const stable = s >= 2 || (s >= 1 && know.total >= 2 * know.alive);
   if (stable) {
     if (roses.length > 0 && random() < params.stableMore) {
       return { command: { type: "placeDisc", discId: roses[0]!.id! }, reason: `再盖一张玫瑰：你板上就有 ${s + 1} 张稳的，叫价的底气更足。` };
+    }
+    if (s >= 2 && random() < mixChance(ctx, params.mix.slowOpen, params.mix.lateDiscs)) {
+      const low = 1 + Math.floor(random() * (s - 1));
+      return openBid(low, `装弱：你板上 ${s} 张都是玫瑰，只叫 ${low}，让别人以为你没底气；有人加注你还能再往上加。`);
     }
     const count = Math.max(1, Math.min(s, maxBid(ctx, ctx.theta)));
     return openBid(count, `你板上 ${s} 张都是玫瑰，叫 ${count} 一定翻得过。`);
@@ -305,6 +363,15 @@ function decideBidding(ctx: Ctx): BotDecision {
   const myMax = maxBid(ctx, ctx.theta);
   const leader = know.opponents.find((opponent) => opponent.id === view.bidder);
   const anyFlower = know.opponents.some((opponent) => opponent.player.flowerUp);
+  if (
+    myMax > bid
+    && !anyFlower
+    && !ctx.me.flowerUp
+    && bidChance(ctx, bid + 1) < 0.999
+    && random() < mixChance(ctx, params.mix.slowPass, params.mix.lateDiscs)
+  ) {
+    return { command: { type: "pass" }, reason: `装弱：其实还能加，但这手成功率不算高，先 pass，让别人摸不清你的板。` };
+  }
   if (myMax > bid) {
     let target = bid + 1;
     if (myMax >= bid + 2 && random() < (anyFlower ? params.jumpFlower : params.jumpProb)) target = myMax;
@@ -333,6 +400,13 @@ function decideBidding(ctx: Ctx): BotDecision {
   }
   const next = bid + 1;
   if (ctx.skullDepth > 0 && next >= ctx.skullDepth) {
+    const stillIn = know.opponents.filter((opponent) => !opponent.player.passed).length;
+    if (next < know.total && stillIn >= 2 && random() < mixChance(ctx, params.mix.bluffRaise, params.mix.bluffDiscs)) {
+      return {
+        command: { type: "raise", count: next },
+        reason: `冒险唬人：再加就会翻到你自己的骷髅，但还有 ${stillIn} 个人没 pass，加到 ${next} 装作还能翻，逼别人往上加、来翻你的骷髅；要是大家都 pass，你会翻到自己的骷髅、丢一张。`,
+      };
+    }
     return { command: { type: "pass" }, reason: `再加就要翻到你自己的骷髅（从顶往下第 ${ctx.skullDepth} 张），pass。` };
   }
   const p = bidChance(ctx, next);

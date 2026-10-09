@@ -2,7 +2,7 @@
  * 人机自对弈 / 对基线的对局驱动（测试和 ~/projects/qa-reports/tools/bots/sim-skull.ts 共用）。
  * 每个策略只拿到 redactGameForViewer 的视角；命令不合法时 applyCommand 会抛错，记成问题。
  */
-import { botPolicy, greedyPolicy, honestPolicy, randomPolicy } from "../src/bot-baselines.js";
+import { botPolicy, exploiterPolicy, greedyPolicy, honestPolicy, legacyPolicy, randomPolicy } from "../src/bot-baselines.js";
 import {
   advance,
   applyCommand,
@@ -19,12 +19,17 @@ import type { GameCommand, GameState } from "../src/types.js";
 
 export type Policy = (view: GameState, me: string, random: () => number) => GameCommand | null;
 
-export const POLICIES: Record<"bot" | "random" | "honest" | "greedy", Policy> = {
+export const POLICIES: Record<"bot" | "legacy" | "random" | "honest" | "greedy", Policy> = {
   bot: botPolicy,
+  legacy: legacyPolicy,
   random: randomPolicy,
   honest: honestPolicy,
   greedy: greedyPolicy,
 };
+
+/** 按人机座位 id 造对手策略（剥削者要知道谁是人机）。 */
+export type PolicyFactory = (botId: string) => Policy;
+export const EXPLOITER: PolicyFactory = (botId) => exploiterPolicy(botId) as Policy;
 
 /** 一局最多走多少步（系统翻牌也算一步）。正常一局 6 人也就两三百步。 */
 export const MAX_STEPS = 3000;
@@ -156,7 +161,7 @@ export interface MatchResult {
 }
 
 /** 1 个 a 对 seats − 1 个 b，a 轮流坐每个座位；lastChance 为 "half" 时一半局开 Last Chance。 */
-export function match(a: Policy, b: Policy, games: number, seats: number, seedBase = 1000, lastChance: boolean | "half" = "half"): MatchResult {
+export function match(a: Policy, b: Policy | PolicyFactory, games: number, seats: number, seedBase = 1000, lastChance: boolean | "half" = "half", bIsFactory = false): MatchResult {
   let wins = 0;
   let twoWins = 0;
   let rankSum = 0;
@@ -167,7 +172,8 @@ export function match(a: Policy, b: Policy, games: number, seats: number, seedBa
   const botMs: number[] = [];
   for (let index = 0; index < games; index += 1) {
     const seat = index % seats;
-    const policies = Array.from({ length: seats }, (_, k) => (k === seat ? a : b));
+    const other: Policy = bIsFactory ? (b as PolicyFactory)(`p${seat + 1}`) : (b as Policy);
+    const policies = Array.from({ length: seats }, (_, k) => (k === seat ? a : other));
     const lc = lastChance === "half" ? Math.floor(index / seats) % 2 === 1 : lastChance;
     const result = playGame(policies, seedBase + index, { lastChance: lc, timeBot: a });
     problems.push(...result.problems);

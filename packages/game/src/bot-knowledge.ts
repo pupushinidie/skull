@@ -189,7 +189,29 @@ export function boardRisks(
   return { risks, isLastChance: unrevealedTopDown.map((entry) => entry.disc.lastChance === true) };
 }
 
-export function buildKnowledge(view: GameState, me: string, risk: RiskParams, history: HistoryParams): Knowledge {
+/**
+ * 「剥削者」基线（测强度用，不是人机自己的打法）眼里第 1 轮旧版人机的板：
+ * 旧版的骷髅只在准备阶段盖（只可能是最底那张），叫价永远是真的（叫过的层数一定是玫瑰）。所以：
+ * - 不是最底那张：风险 0；
+ * - 最底那张：它叫过的层数盖住了整块板 → 0；正好叫到「板上张数 − 1」（旧版诱饵的样子）→ 0.9；
+ *   全盖出来了（骷髅一定在板上）→ h；开叫后一声不吭就 pass → 0.6h；其余 0.35h（旧版准备阶段约两到四成盖骷髅）。
+ */
+export function exploitRisks(stack: readonly StackDisc[], discs: number, h: number, claim: number, quickPass: boolean): { risks: number[]; isLastChance: boolean[] } {
+  const n = stack.filter((disc) => !disc.lastChance).length;
+  let bottom: number;
+  if (claim >= stack.length) bottom = 0;
+  else if (n >= 2 && claim === stack.length - 1) bottom = 0.9;
+  else if (n >= discs) bottom = h;
+  else if (quickPass) bottom = 0.6 * h;
+  else bottom = 0.35 * h;
+  const topDown = stack.map((disc, depth) => ({ disc, depth })).filter((entry) => !entry.disc.revealed).reverse();
+  return {
+    risks: topDown.map((entry) => (entry.disc.lastChance || entry.depth !== 0 ? 0 : bottom)),
+    isLastChance: topDown.map((entry) => entry.disc.lastChance === true),
+  };
+}
+
+export function buildKnowledge(view: GameState, me: string, risk: RiskParams, history: HistoryParams, exploitTarget: string | null = null): Knowledge {
   const self = view.players.find((player) => player.id === me);
   if (!self) throw new Error("人机不在这局里。");
   const opponents: OpponentInfo[] = [];
@@ -198,7 +220,9 @@ export function buildKnowledge(view: GameState, me: string, risk: RiskParams, hi
     const discs = discCount(player);
     const { h, habit, cred } = historyEstimate(view, player.id, history);
     const { claim, quickPass } = bidBehaviour(view.roundLog, player.id);
-    const board = boardRisks(player.stack, discs, h, habit, cred, claim, quickPass, risk);
+    const board = player.id === exploitTarget
+      ? exploitRisks(player.stack, discs, h, claim, quickPass)
+      : boardRisks(player.stack, discs, h, habit, cred, claim, quickPass, risk);
     opponents.push({ id: player.id, name: player.name, player, discs, h, habit, cred, claim, quickPass, ...board });
   }
   return {

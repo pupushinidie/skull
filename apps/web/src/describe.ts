@@ -50,7 +50,7 @@ export function promptText(game: GameState, selfId: string, spectating: boolean,
     case "roundEnd": {
       const log = game.roundLog;
       const head = log.result === "success" ? `${subj(nameOf(log.challenger))}挑战成功！` : `${subj(nameOf(log.challenger))}挑战失败`;
-      return { text: `${head} 点「继续」开下一轮`, mine };
+      return { text: head, mine };
     }
   }
 }
@@ -156,7 +156,7 @@ export function describeEvent(event: GameEvent, nameOf: NameOf): string | null {
     case "GameEnded":
       return `${subj(nameOf(event.winner))}获胜（${event.reason === "twoWins" ? "成功两次" : "活到最后"}）`;
     case "TimedOut":
-      return `${subj(nameOf(event.player))}超时，系统替他走了一步`;
+      return `${subj(nameOf(event.player))}超时，系统替${nameOf(event.player) === "你" ? "你" : "他"}走了一步`;
   }
 }
 

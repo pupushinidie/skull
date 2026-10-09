@@ -258,7 +258,7 @@ export function Plate({ name, seat, isMe, tags, onBoard, inHand, status, lastBid
         </span>
         <span className="sk-plate-name">
           <b title={name}>{isMe ? "你" : name}</b>
-          {tags.length > 0 && <span className="sk-tags">{tags.map((tag) => <i key={tag} className={`sk-tag tag-${tag}`}>{tag}</i>)}</span>}
+          {tags.length > 0 && !compact && <span className="sk-tags">{tags.map((tag) => <i key={tag} className={`sk-tag tag-${tag}`}>{tag}</i>)}</span>}
         </span>
       </div>
       {status.eliminated ? (
@@ -283,8 +283,9 @@ export function Plate({ name, seat, isMe, tags, onBoard, inHand, status, lastBid
           {shown.map((face, index) => <DiscImg key={index} face={face} scale={1} />)}
         </div>
       )}
-      {(icons.length > 0 || lastBid) && (
+      {(icons.length > 0 || lastBid || (compact && tags.length > 0)) && (
         <div className="sk-plate-status">
+          {compact && tags.map((tag) => <i key={tag} className={`sk-tag tag-${tag}`}>{tag}</i>)}
           {icons}
           {lastBid && <span className={lastBid === "过" ? "sk-lastbid pass" : "sk-lastbid"}>{lastBid}</span>}
         </div>

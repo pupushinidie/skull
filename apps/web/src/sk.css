@@ -282,10 +282,10 @@
 .sk-flips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
 .sk-flips span { display: inline-flex; flex-direction: column; align-items: center; }
 .sk-flips small { max-width: 48px; overflow: hidden; color: var(--muted); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-.sk-log { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 72px; }
+.sk-log { display: flex; flex: 1 1 0; flex-direction: column; min-height: 72px; overflow: hidden; }
 .sk-log ul { flex: 1 1 auto; min-height: 0; margin: 0; padding-left: 16px; overflow-y: auto; color: var(--text); }
 .sk-log li { line-height: 1.5; }
-.sk-chat { display: flex; flex: 0 1 auto; min-height: 0; }
+.sk-chat { display: flex; flex: 0 0 auto; min-height: 0; }
 .app-shell .sk-chat .room-chat.light { display: flex; flex: 1 1 auto; flex-direction: column; min-height: 0; margin: 0; padding: 8px 10px; }
 .app-shell .sk-chat .room-chat-heading { margin-bottom: 6px; }
 .app-shell .sk-chat .room-chat-list { flex: 1 1 auto; height: auto; min-height: 72px; max-height: 220px; }
@@ -318,6 +318,7 @@
 .app-shell .sk-final :is(.sk-big-button, .sk-mid-button) { min-height: 48px; margin: 0; padding: 4px 20px; font-size: 24px; width: auto; }
 
 /* ---------------------------------------------------------------- 规则弹窗 */
+.gm-modal-backdrop { white-space: normal; }
 .app-shell .sk-rules { display: flex; flex-direction: column; width: min(760px, 100%); max-height: calc(100dvh - 48px); padding: 16px 20px; }
 .sk-rules-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .app-shell .sk-rules-head h2 { margin: 0; }
@@ -331,6 +332,11 @@
 .sk-rules-mat { vertical-align: middle; width: 28px; height: 32px; }
 @media (max-width: 719px) {
   .sk-rules-body { grid-template-columns: 1fr; }
+  .app-shell .sk-final { padding: 16px 12px; }
+  .sk-final-list li { grid-template-columns: 24px 32px minmax(0, 1fr); row-gap: 0; }
+  .sk-final-what { grid-column: 3; }
+  .sk-final-discs { grid-column: 3; }
+  .sk-final-list li .sk-final-what, .sk-final-list li.win .sk-final-what { font-size: 12px; }
 }
 
 /* ---------------------------------------------------------------- 首页 */
@@ -485,12 +491,14 @@
 .sk-mobile .sk-stage .sk-center-line strong { font-size: 12px; }
 .sk-mobile .sk-stage .sk-center.result .sk-center-line strong { font-size: 24px; }
 .sk-mobile .sk-stage .sk-center.result .sk-center-line span { font-size: 12px; }
-.sk-mobile .sk-stage .sk-hand { grid-area: hand; justify-content: center; padding-top: 20px; }
+.sk-mobile .sk-stage .sk-hand { grid-area: hand; justify-content: center; padding-top: 12px; }
+.sk-mobile .sk-stage .sk-hand-tip { top: -6px; }
+.sk-mobile .sk-stage .sk-plate-shown { display: none; }
+.sk-mobile .sk-stage .sk-action-stack { gap: 6px; }
 .sk-mobile .sk-stage .sk-action { grid-area: action; width: auto; min-height: 0; padding: 8px; }
 .sk-mobile .sk-stage .sk-plate { gap: 2px; padding: 4px; }
 .sk-mobile .sk-stage .sk-plate.compact .sk-avatar img { display: none; }
 .sk-mobile .sk-stage .sk-plate.compact .sk-avatar { position: absolute; left: 0; top: 0; width: 1px; height: 1px; }
-.sk-mobile .sk-stage .sk-plate.compact .sk-tags { display: none; }
 .sk-mobile .sk-stage .sk-counts { gap: 4px; }
 .sk-mobile .sk-stage .sk-count { display: flex; align-items: baseline; gap: 1px; }
 .sk-mobile .sk-stage .sk-count small { line-height: 1.5; }
@@ -504,6 +512,7 @@
 .sk-screen.sk-mobile { height: auto; min-height: 100%; }
 .sk-screen.sk-mobile .sk-side { position: static; display: flex; width: auto; box-shadow: none; }
 .sk-mobile .sk-side { flex: 0 0 auto; padding: 8px; border-left: 0; border-top: var(--px) solid #4a2a1a; overflow: visible; }
+.sk-mobile .sk-log { flex: 0 0 auto; }
 .sk-mobile .sk-log ul { max-height: 160px; }
 .app-shell .sk-mobile .sk-stage .sk-big-button { min-height: 48px; }
 .app-shell .sk-mobile .sk-stage .sk-mid-button { min-height: 44px; }

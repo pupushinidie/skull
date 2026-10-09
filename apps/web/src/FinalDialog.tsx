@@ -1,7 +1,7 @@
 /**
  * 终局弹窗：奖杯 + 缎带上写获胜者，每个人的结果（成功次数、还剩几张、第几轮出局），再来一局投票。
  */
-import type { CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { discCount, type GameState, type LobbyRoomSnapshot } from "@skull/game";
 import { avatarArt, seatHex, SHEETS, uiArt } from "./art.js";
 import { Icon, Sprite } from "./pieces.js";
@@ -17,6 +17,15 @@ export function FinalDialog({ game, room, myId, spectating, onRematch, onLeave }
 }) {
   const winner = game.players.find((player) => player.id === game.winners[0]) ?? game.players[0]!;
   const accepted = room.rematch?.acceptedIds.includes(socket.id ?? "") ?? false;
+  // 「再来一局」倒计时：快照里是发送时剩余的毫秒数，本地往下数
+  const [anchor, setAnchor] = useState({ at: Date.now(), ms: room.rematch?.remainingMs ?? 0 });
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => setAnchor({ at: Date.now(), ms: room.rematch?.remainingMs ?? 0 }), [room.rematch?.remainingMs]);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 500);
+    return () => window.clearInterval(timer);
+  }, []);
+  const rematchLeft = Math.max(0, Math.ceil((anchor.ms - (now - anchor.at)) / 1000));
   // 名次：获胜者、还活着的（按成功次数、剩余张数）、出局的（越晚出局越靠前）
   const ranked = [...game.players].sort((a, b) => {
     if (a.id === winner.id) return -1;
@@ -58,7 +67,7 @@ export function FinalDialog({ game, room, myId, spectating, onRematch, onLeave }
           <div className="gm-panel-actions"><button className="quiet-button" type="button" onClick={onLeave}>离开观战</button></div>
         ) : room.rematch ? (
           <div className="sk-rematch">
-            <span>再来一局？还剩 <b>{Math.ceil(room.rematch.remainingMs / 1000)}</b> 秒 · {room.rematch.acceptedIds.length}/{room.members.length} 人同意</span>
+            <span>再来一局？还剩 <b>{rematchLeft}</b> 秒 · {room.rematch.acceptedIds.length}/{room.members.length} 人同意</span>
             <div className="gm-panel-actions">
               <button className="quiet-button sk-mid-button" type="button" onClick={() => onRematch(false)}>离开</button>
               <button className="primary-button sk-big-button" type="button" disabled={accepted} onClick={() => onRematch(true)} data-tutorial="rematch-button">{accepted ? "等其他人" : "再来一局"}</button>

@@ -620,7 +620,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   else {
     const base = promptText(view, selfId, spectating, nameOf);
     if (spectating) prompt = { text: `观战中 · ${base.text}`, mine: false };
-    else if (autoPlaying && view.phase !== "gameOver") prompt = { text: "托管中：人机替你走，点「取消托管」拿回来", mine: false };
+    else if (autoPlaying && view.phase !== "gameOver") prompt = { text: "托管中：人机在替你走", mine: false };
     else if (me?.eliminated && view.phase !== "gameOver" && !myTurn) prompt = { text: `你已出局 · ${base.text}`, mine: false };
     else prompt = base;
   }

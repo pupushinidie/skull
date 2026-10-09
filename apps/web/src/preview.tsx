@@ -17,6 +17,7 @@
  *   emotes=p2:laugh,p3:skull   这些座位每 2 秒冒一次表情气泡（截图用）
  *   rematch=1     终局带「再来一局」投票
  *   lc=1          等候房间 / 首页打开 Last Chance 碟
+ *   hint=1        操作面板显示人机给的提示（botHint 的理由，教程的「提示」按钮用）
  */
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import ReactDOM from "react-dom/client";
@@ -24,6 +25,7 @@ import {
   advance,
   applyCommand,
   botCommand,
+  botHint,
   buildGame,
   createScene,
   DEFAULT_ROOM_ACCESS,
@@ -212,6 +214,7 @@ function BoardPreview() {
         watchId={watchId}
         onWatch={setWatchId}
         onLeave={() => setError("预览页：离开")}
+        hint={params.get("hint") === "1" ? botHint(redactGameForViewer(full, viewer), viewer, () => 0.5)?.reason : undefined}
       />
       {confirmDialog}
     </main>

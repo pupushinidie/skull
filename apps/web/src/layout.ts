@@ -33,6 +33,8 @@ export interface BoardLayout {
   readonly slots: readonly SeatSlot[];
   /** 行间距。 */
   readonly gap: number;
+  /** 桌面排法放得下（放不下时界面改走手机竖排）。 */
+  readonly fits: boolean;
 }
 
 const PLATE_W: Record<number, number> = { 1: 64, 2: 156, 3: 180, 4: 216 };
@@ -58,7 +60,7 @@ export function pickLayout(width: number, height: number, opponents: number, han
   const { slots, sides, topCount } = slotsFor(opponents);
   if (width < 720) {
     const scale = opponents <= 2 && width >= 360 ? 2 : 1;
-    return { mobile: true, scale, handScale: 2, plateW: scale === 2 ? 64 : 60, actionW: width, sides: false, topCount: opponents, slots: Array.from({ length: opponents }, (_, index) => ({ row: "top" as const, index })), gap: 6 };
+    return { mobile: true, scale, handScale: 2, plateW: scale === 2 ? 64 : 60, actionW: width, sides: false, topCount: opponents, slots: Array.from({ length: opponents }, (_, index) => ({ row: "top" as const, index })), gap: 6, fits: true };
   }
   for (const scale of [4, 3, 2]) {
     const matW = MAT.w * scale;
@@ -78,10 +80,10 @@ export function pickLayout(width: number, height: number, opponents: number, han
       const middleH = sides ? matH : CENTER_ROW_H;
       for (const gap of [12, 8, 4]) {
         const total = matH + middleH + bottomH + 2 * gap;
-        if (total <= height) return { mobile: false, scale, handScale, plateW, actionW, sides, topCount, slots, gap };
+        if (total <= height) return { mobile: false, scale, handScale, plateW, actionW, sides, topCount, slots, gap, fits: true };
       }
     }
   }
   // 再小也按 2× 排（不会出现在四种验收尺寸里）
-  return { mobile: false, scale: 2, handScale: 2, plateW: PLATE_W[2]!, actionW: ACTION_W[2]!, sides, topCount, slots, gap: 4 };
+  return { mobile: false, scale: 2, handScale: 2, plateW: PLATE_W[2]!, actionW: ACTION_W[2]!, sides, topCount, slots, gap: 4, fits: false };
 }

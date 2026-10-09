@@ -31,6 +31,7 @@
 .app-shell.sk-game { width: 100%; max-width: none; margin: 0; }
 @media (min-width: 720px) {
   .app-shell.sk-game { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+  .app-shell.sk-game:has(> .sk-mobile) { height: auto; min-height: 100vh; overflow: visible; }
 }
 .sk-screen { display: flex; flex-direction: column; height: 100%; min-height: 0; }
 .sk-topbar {
@@ -544,4 +545,14 @@
   .sk-fx, .sk-petals, .sk-spotlight { display: none; }
   .sk-stage.shake, .sk-stage .sk-mat-img.turn, .sk-stage .sk-stack-disc.drop, .sk-bubble, .sk-stage .sk-big b.pop { animation: none; }
   .sk-stage .sk-mat.glow, .sk-stage .sk-prompt.urgent .sk-timer, .sk-stage .sk-center-line .sk-suspense { animation: none; }
+}
+
+/* 确认框（解散房间等）：按钮是主要操作，24px */
+.app-shell .gm-confirm .gm-panel-actions button { min-height: 44px; padding: 4px 18px; font-size: 24px; }
+
+/* 矮屏（高度 < 700）侧栏再收紧一点 */
+@media (max-height: 699px) {
+  .app-shell .sk-chat .room-chat-list { min-height: 40px; max-height: 120px; }
+  .app-shell .sk-chat .room-chat-heading span { display: none; }
+  .sk-log { min-height: 48px; }
 }

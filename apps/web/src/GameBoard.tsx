@@ -144,8 +144,10 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   const autoPlaying = member?.auto === true;
   const secondsLeft = useCountdown(room);
   const viewport = useViewport();
-  const mobile = viewport.w < 720;
   const wideSide = viewport.w >= 1280;
+  const playerCount = game.players.length;
+  // 桌面排法按可视区域估一下放不放得下（竖屏平板这类窄而高的屏幕），放不下就走手机竖排
+  const mobile = viewport.w < 720 || !pickLayout(viewport.w - (wideSide ? 300 : 0) - 32, viewport.h - 48 - 48 - 24, playerCount - 1, 5).fits;
   const later = useTimers();
 
   /* ---------- 动画：按住上一个状态 + 特效 ---------- */
@@ -404,7 +406,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   const opponents = rotateFrom(view.players, viewId).slice(1);
   const handMax = me && (me.hand.length >= 5 || holdsLastChance(view, me)) ? 5 : 4;
   const layout: BoardLayout = useMemo(
-    () => pickLayout(mobile ? viewport.w : tableSize.w, tableSize.h, opponents.length, handMax),
+    () => pickLayout(mobile ? Math.min(viewport.w, 719) : tableSize.w, tableSize.h, opponents.length, handMax),
     [mobile, viewport.w, tableSize.w, tableSize.h, opponents.length, handMax],
   );
   const [drawer, setDrawer] = useState(false);
@@ -625,6 +627,10 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
     else if (autoPlaying && view.phase !== "gameOver") prompt = { text: "托管中：人机在替你走", mine: false };
     else if (me?.eliminated && view.phase !== "gameOver" && !myTurn) prompt = { text: `你已出局 · ${base.text}`, mine: false };
     else prompt = base;
+    const turnMember = view.turn && view.turn !== selfId ? memberOf(view.turn) : undefined;
+    if (turnMember && !turnMember.bot && (!turnMember.connected || turnMember.auto) && ["placeOrBid", "bidding", "resolving", "loseChoosing", "chooseFirst"].includes(view.phase)) {
+      prompt = { ...prompt, text: `${prompt.text}（${turnMember.connected ? "托管中" : "掉线了"}，人机代打）` };
+    }
   }
   const firstVersion = useRef(game.version);
   const shownNotice = game.version === firstVersion.current ? notice : "";

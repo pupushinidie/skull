@@ -8,6 +8,7 @@ import {
   advance,
   applyCommand,
   botCommand,
+  botEmote,
   CAPACITY_OPTIONS,
   createGame,
   createRng,
@@ -104,6 +105,8 @@ const ROUND_END_MS_OVERRIDE = process.env.ROUND_END_MS ? Number(process.env.ROUN
 const BOT_NAMES = ["咕噜一号", "咕噜二号", "咕噜三号", "咕噜四号", "咕噜五号"];
 /** 人机每一步的停顿乘上这个倍数；测试时设成 0 让人机立刻行动。 */
 const BOT_DELAY_SCALE = Number(process.env.BOT_DELAY_SCALE ?? 1);
+/** 测试用：人机在该发表情的时候一定发（不掷 35% / 40% / 25%）。 */
+const BOT_EMOTE_FORCE = process.env.BOT_EMOTE_FORCE === "1";
 /** 离线的人轮到时先等这么久再由人机代打（刷新页面、短暂断线的人来得及回来）。 */
 const OFFLINE_GRACE_MS = 3_000;
 /** 连续超时几次转托管。 */
@@ -618,6 +621,7 @@ function expireTurn(room: RoomState, key: string): void {
 
 /** 对局状态变化后：结束则清空聊天并发起继续投票，否则更新回合计时。 */
 function afterGameChange(room: RoomState): void {
+  scheduleBotEmotes(room);
   if (room.game?.phase === "gameOver") {
     clearGameTimers(room);
     room.chat = [];
@@ -626,6 +630,28 @@ function afterGameChange(room: RoomState): void {
     return;
   }
   updateTurnTimer(room);
+}
+
+/**
+ * 人机偶尔发个快捷表情（他拍板：少量，只在挑战成败那一下，见 botEmote）。
+ * 只给纯人机座位发；托管、离线的真人绝不替他发。停 0.6–1.5 秒（乘 BOT_DELAY_SCALE）再发，照常走 sendEmote 的限频。
+ */
+function scheduleBotEmotes(room: RoomState): void {
+  const game = room.game;
+  if (!game) return;
+  for (const member of room.members) {
+    if (member.bot !== true) continue;
+    const random = BOT_EMOTE_FORCE ? () => 0 : Math.random;
+    const id = botEmote(redactGameForViewer(game, member.playerId), member.playerId, random);
+    if (!id) continue;
+    const version = game.version;
+    const timer = setTimeout(() => {
+      if (rooms.get(room.code) !== room || !room.game || room.game.version < version) return;
+      if (!room.members.some((candidate) => candidate.playerId === member.playerId && candidate.bot === true)) return;
+      sendEmote(room, member.playerId, id);
+    }, (600 + 900 * Math.random()) * BOT_DELAY_SCALE);
+    timer.unref();
+  }
 }
 
 /** 种子用服务端的安全随机数生成；所有骰子都在服务端掷。新的一局托管和超时次数都清零。 */

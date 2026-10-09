@@ -2,6 +2,7 @@ import { AddressInfo } from "node:net";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { io as createClient, type Socket } from "socket.io-client";
 import {
+  EMOTE_IDS,
   legalActions,
   type AckResponse,
   type Capacity,
@@ -57,6 +58,8 @@ process.env.FLIP_MS = "0";
 process.env.ROUND_END_MS = "300";
 // 对局中所有真人都离线多久后关房（默认 2 分钟，测试调短）
 process.env.ROOM_ABANDON_MS = "600";
+// 人机该发表情的时候一定发（不掷概率），方便测「只有纯人机发、托管和离线的真人不发」
+process.env.BOT_EMOTE_FORCE = "1";
 
 
 type TestSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -126,6 +129,13 @@ function updateWhere(client: TestSocket, test: (room: LobbyRoomSnapshot) => bool
   });
 }
 
+/** 记下这个连接收到的所有快捷表情。 */
+function recordEmotes(client: TestSocket): { id: string; from: string }[] {
+  const seen: { id: string; from: string }[] = [];
+  client.on("room:emote", (emote) => seen.push({ id: emote.id, from: emote.from }));
+  return seen;
+}
+
 function seatOf(client: TestSocket): string {
   return latest.get(client)?.members.find((member) => member.id === client.id)?.playerId ?? "";
 }
@@ -193,10 +203,19 @@ describe("人机", () => {
     const names = (await updateWhere(host, (snapshot) => snapshot.members.length === SOLO_CAPACITY)).members.map((member) => member.name);
     expect(names.slice(1)).toEqual(["咕噜一号", "咕噜二号", "咕噜三号", "咕噜四号"].slice(0, SOLO_CAPACITY - 1));
 
+    const emotes = recordEmotes(host);
     expect((await start(host)).ok).toBe(true);
     const stop = autoplay(host);
     const finished = await updateWhere(host, (snapshot) => snapshot.game?.phase === "gameOver", 60_000);
     stop();
+    // 人机在挑战成败那一下发表情（测试里强制一定发）：只有人机座位发，发的都是合法 id
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const botSeats = finished.members.filter((member) => member.bot).map((member) => member.playerId);
+    expect(emotes.length).toBeGreaterThan(0);
+    for (const emote of emotes) {
+      expect(botSeats).toContain(emote.from);
+      expect(EMOTE_IDS as readonly string[]).toContain(emote.id);
+    }
     const bots = finished.members.filter((member) => member.bot).map((member) => member.id);
     expect(finished.rematch?.acceptedIds.sort()).toEqual(bots.sort());
 
@@ -242,6 +261,7 @@ describe("人机", () => {
     const { code } = await create(idle, nick("发呆"), MIN_CAPACITY);
     expect((await call<LobbyRoomSnapshot>((ack) => active.emit("room:join", { name: nick("认真"), code }, ack))).ok).toBe(true);
     await addBotsUpTo(idle, 2);
+    const idleEmotes = recordEmotes(active);
     expect((await start(idle)).ok).toBe(true);
     const stop = autoplay(active);
 
@@ -258,7 +278,27 @@ describe("人机", () => {
     expect((await call<void>((ack) => idle.emit("room:auto", false, ack))).ok).toBe(true);
     await updateWhere(idle, (snapshot) => !isAuto(snapshot));
     stop();
+    // 托管中的真人不会被替着发表情
+    expect(idleEmotes.some((emote) => emote.from === idleSeat)).toBe(false);
   }, 30_000);
+
+  it("真人整局托管：人机替他打完，但表情只有纯人机座位发，绝不替托管的真人发", async () => {
+    const host = await connect();
+    await create(host, nick("全托"), MIN_CAPACITY);
+    await addBotsUpTo(host, 1);
+    const emotes = recordEmotes(host);
+    const started = await start(host);
+    if (!started.ok) throw new Error(started.error);
+    const hostSeat = started.data.members.find((member) => member.id === host.id)!.playerId;
+    expect((await call<void>((ack) => host.emit("room:auto", true, ack))).ok).toBe(true);
+    const finished = await updateWhere(host, (snapshot) => snapshot.game?.phase === "gameOver", 60_000);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(emotes.length).toBeGreaterThan(0);
+    expect(emotes.some((emote) => emote.from === hostSeat)).toBe(false);
+    // 他（由人机代打）当过挑战者或骷髅被人踩到的轮次里，纯人机会发，他不会发；这一局有这种轮次时断言才有分量（多数局都有）
+    const hostTriggers = [...finished.game!.history, finished.game!.roundLog].filter((log) => log.challenger === hostSeat || log.skullOwner === hostSeat).length;
+    if (hostTriggers === 0) console.warn("这一局托管的真人没当过挑战者，表情断言偏弱");
+  }, 90_000);
 
   it("掉线的人轮到时由人机代打（不算超时），用原昵称回来后交还", async () => {
     const leaver = await connect();

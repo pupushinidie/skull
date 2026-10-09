@@ -524,7 +524,7 @@ export interface SceneOptions {
 
 /** 补满座位：第 4 个起每人板上 1 朵玫瑰或「骷髅 + 玫瑰」交替。 */
 function extras(count: number, specs: PlayerSpec[]): PlayerSpec[] {
-  const result = [...specs];
+  const result = specs.slice(0, count);
   for (let index = result.length; index < count; index += 1) result.push({ stack: index % 2 === 0 ? ["rose"] : ["skull", "rose"] });
   return result;
 }

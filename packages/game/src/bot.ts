@@ -31,6 +31,7 @@ import {
   type RiskParams,
 } from "./bot-knowledge.js";
 import { discCount, legalActions, nextPlayer } from "./engine.js";
+import type { EmoteId } from "./roomTypes.js";
 import type { Disc, GameCommand, GameState, Player } from "./types.js";
 
 /** 可调的参数（以后「调弱一点」就改这里）。 */
@@ -450,4 +451,24 @@ export function botCommand(view: GameState, playerId: string, random: () => numb
  */
 export function botHint(view: GameState, playerId: string, random: () => number = Math.random): BotDecision | null {
   return botDecision(view, playerId, random);
+}
+
+/**
+ * 人机要不要发个快捷表情（提议，服务器默认没接）：只看这一步的事件，偶尔发一个，不刷屏。
+ * - 自己挑战成功：35% 发「笑」或「玫瑰」；
+ * - 别人翻到了自己的骷髅：40% 发「骷髅」或「挑衅」；
+ * - 自己挑战失败：25% 发「流汗」或「摊手」。
+ * 其余时候返回 null。只给纯人机座位用（托管、离线的真人不替他发）；服务器照常走 sendEmote 的限频。
+ */
+export function botEmote(view: GameState, playerId: string, random: () => number = Math.random): EmoteId | null {
+  for (const event of view.events) {
+    if (event.type === "ChallengeSucceeded" && event.challenger === playerId) {
+      return random() < 0.35 ? (random() < 0.5 ? "laugh" : "rose") : null;
+    }
+    if (event.type === "ChallengeFailed") {
+      if (event.skullOwner === playerId && event.challenger !== playerId) return random() < 0.4 ? (random() < 0.5 ? "skull" : "taunt") : null;
+      if (event.challenger === playerId) return random() < 0.25 ? (random() < 0.5 ? "sweat" : "shrug") : null;
+    }
+  }
+  return null;
 }

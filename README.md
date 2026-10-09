@@ -150,8 +150,26 @@ BASE_PATH=/skull/ npm run build
 | `redactGameForViewer(state, viewerId, { seeAll? })` | 给某个视角看的状态（**所有下发都要经过它**）；观战用 `""`，「观战看底牌」用 `{ seeAll: true }` |
 | `totalDiscsInPlay`、`discCount`、`unrevealedCount`、`alivePlayers`、`nextPlayer`、`holdsLastChance`、`flippableMats`、`canRevealStack`、`findPlayer` | 常用查询 |
 | `checkInvariants(state)` | 完整状态自洽检查，返回问题列表（空 = 没问题） |
-| `botCommand(view, playerId)` | 人机（现在是随机占位，人机阶段换成正式策略）；`view` 必须是 `redactGameForViewer(game, playerId)` |
+| `botCommand(view, playerId, random?)` | 人机这一步的命令（服务器、托管、离线代打用）；`view` 必须是 `redactGameForViewer(game, playerId)`，拿到完整状态会报错；轮不到它返回 `null`。见下面「人机」 |
+| `botDecision(view, playerId, random?)` / `botHint(view, playerId, random?)` | 返回 `{ command, reason }`：人机会怎么走、一句第二人称的中文理由（教程「提示」按钮用）。理由会提到自己的牌面，**只在本人浏览器里算、只给本人看** |
+| `botEmote(view, playerId, random?)` | 提议：人机在挑战成败那一下偶尔发个快捷表情 id（服务器默认没接） |
 | `createRng(seed)`、`scriptedRng(ints, seed?)` | 种子随机数；按剧本出 `int` 的随机数（教程、测试用） |
+
+### 人机（`src/bot.ts`、`src/bot-knowledge.ts`，「普通」难度）
+
+- **只吃裁剪后的视角**：`botCommand(redactGameForViewer(game, p), p)`。视角里看得见别人没翻开的牌面、种子或动作序列时直接抛错（有单测）。
+- **每个阶段都会走**：准备盖牌、盖或开叫、加注 / pass、选板、自选失牌、指定先手；结算画面只点继续，**从不亮牌**（开工拍板：人机默认不亮）。
+- **理由**：`botDecision` / `botHint` 返回 `{ command, reason }`，比如「你底下盖的是骷髅、上面 1 张玫瑰：开叫 1，被放过就赢……千万别叫到 2。」「咕噜二号 叫到过 2，他顶上的多半是玫瑰，先翻他的（这样翻完的成功率约 91%）。」教程提示按钮建议传 `random = () => 0.99`（不触发「偶尔换个打法」的随机，提示稳定、不会建议盖骷髅）。
+- **怎么想的（大白话）**：
+  1. 读牌：每个对手还有没有骷髅（从失牌、骷髅被翻出来、玫瑰全被翻开过推）；他板上每张是骷髅的风险——板上越多越可能藏着骷髅、最底那张最危险、他自己叫过价的那几张多半是玫瑰（老叫到自己骷髅上的人不信）、以前老翻出他骷髅的人风险高。同一块板风险相加，不同板相乘。
+  2. 叫价：算「叫 b 能翻满的概率」，自己板上全是玫瑰先吃掉自己的，剩下的在各块对手板之间挑最好的分法；自己板上有骷髅最多叫到骷髅上面那几张。概率 ≥ 门槛就敢叫：自己还剩 4/3/2/1 张时门槛 0.45/0.55/0.65/0.80，差一胜赢整局时降 0.10，拿着 Last Chance 碟时 0.80。
+  3. 加注时多数（80%）直接加到自己能叫的最高数，别人就没法便宜地再加；花面领先者叫价、我 pass 后他多半翻得过时，门槛按「他翻得过的概率 × 0.8」往下降去拦他（最低 0.15），他非得踩我骷髅的就放他过去。
+  4. 准备阶段约两成盖骷髅（有人花面时多两成、自己花面或只剩两张时少一些），盖了就往上叠玫瑰、开低价当诱饵；板上玫瑰够了就开叫自己的张数；不把骷髅叠到自己玫瑰上。
+  5. 当挑战者每一步都选「先翻这块、之后还能凑够」成功率最高的板：Last Chance 碟先翻、叫过价的人先翻、少往一块板底下挖。
+  6. 失牌：4→3 丢玫瑰；3→2 丢玫瑰（花面时丢骷髅）；2→1 丢骷髅。自己把自己淘汰时先手给离赢最远的人。
+- **强度**（`npx tsx ~/projects/qa-reports/tools/bots/sim-skull.ts 1000`，1 个人机对其余座位，一半开 Last Chance，胜率 / 公平值）：对随机 3 人 57% / 33%、4 人 43% / 25%、5 人 38% / 20%、6 人 35% / 17%；对「老实人」89% 左右（各人数）；对「固定概率贪心」89–98%；对「照补充原样做的人机」（一格一格加、骷髅三成）3 人 71%、4 人 55%、5 人 39%、6 人 34%。决策平均 0.005–0.015ms，最慢 3ms。
+- **调弱一点**：改 `BOT_PARAMS`。最有效的是 `jumpProb: 0`（只一格一格加）、`skullFirst.base: 0.3`、`history.credSelf/credOther: 0`（就是上面的「照补充原样做的人机」，对随机 3 人约 47%）；再弱就把 `thresholds` 整体加 0.1。
+- **快捷表情（提议，没接）**：`botEmote` 在自己挑战成功时 35% 发笑 / 玫瑰、别人踩到自己骷髅时 40% 发骷髅 / 挑衅、自己失败时 25% 发流汗 / 摊手，其余不发。要接的话由服务器在纯人机座位上调 `sendEmote`（托管、离线的真人不替他发）。
 
 ### 预览局面工厂（`src/scenes.ts`）
 
@@ -243,7 +261,9 @@ const game = buildGame({
 | `packages/game/src/engine.ts` | 规则引擎、超时动作、隐藏信息裁剪 |
 | `packages/game/src/scenes.ts` | 预览局面工厂 |
 | `packages/game/src/invariants.ts` | 不变量检查 |
-| `packages/game/src/bot.ts` | 人机（人机阶段负责） |
+| `packages/game/src/bot.ts`、`bot-knowledge.ts` | 人机策略和读牌（人机阶段负责） |
+| `packages/game/src/bot-baselines.ts` | 测强度用的三个基线（随机、老实人、固定概率贪心；不从 index 导出） |
+| `packages/game/test/bot*.ts` | 人机决策单测、自对弈、对局驱动（`bot-harness.ts`，模拟脚本 `~/projects/qa-reports/tools/bots/sim-skull.ts` 也用它） |
 | `packages/game/src/roomTypes.ts` | 房间协议（人数、开房选项、表情） |
 | `packages/game/test/` | 规则书用例、随机对局、隐藏信息、预览局面的测试；`test/acceptance/` 归规则核对，引擎不改 |
 | `apps/server/` | Socket.IO 房间服务器和测试 |

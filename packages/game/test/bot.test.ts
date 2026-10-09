@@ -3,7 +3,7 @@
  * 局面都用 buildGame 造（完整状态），交给人机前一律 redactGameForViewer。
  */
 import { describe, expect, it } from "vitest";
-import { BOT_PARAMS, botCommand, botDecision, botHint } from "../src/bot.js";
+import { BOT_PARAMS, botCommand, botDecision, botEmote, botHint } from "../src/bot.js";
 import { boardRisks, bestAllocation } from "../src/bot-knowledge.js";
 import { newRoundLog, redactGameForViewer } from "../src/engine.js";
 import { createRng } from "../src/rng.js";
@@ -403,5 +403,19 @@ describe("读牌", () => {
     const hint = botHint(view(game), "p1", steady);
     expect(hint).toEqual(botDecision(view(game), "p1", steady));
     expect(hint!.reason).toMatch(/[一-龥]/);
+  });
+});
+
+describe("快捷表情（提议，服务器默认没接）", () => {
+  it("只在挑战成败那一下偶尔发，平时不发；发的都是合法表情 id", () => {
+    const base = buildGame({ players: [{ stack: ["rose"] }, { stack: ["rose"] }, { stack: ["rose"] }] });
+    const quiet = view(base);
+    expect(botEmote(quiet, "p1", fixed(0))).toBeNull();
+    const won = { ...quiet, events: [{ type: "ChallengeSucceeded" as const, challenger: "p1", won: false }] };
+    expect(["laugh", "rose"]).toContain(botEmote(won, "p1", fixed(0)));
+    expect(botEmote(won, "p1", fixed(0.99))).toBeNull();
+    const trapped = { ...quiet, events: [{ type: "ChallengeFailed" as const, challenger: "p2", skullOwner: "p1", selfSkull: false }] };
+    expect(["skull", "taunt"]).toContain(botEmote(trapped, "p1", fixed(0)));
+    expect(botEmote(trapped, "p3", fixed(0))).toBeNull();
   });
 });

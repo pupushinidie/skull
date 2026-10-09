@@ -29,7 +29,7 @@ export {
   waitingFor,
 } from "./engine.js";
 export type { NewPlayer, RedactOptions } from "./engine.js";
-export { BOT_PARAMS, botCommand, botDecision, botHint } from "./bot.js";
+export { BOT_PARAMS, botCommand, botDecision, botEmote, botHint } from "./bot.js";
 export type { BotDecision, BotParams } from "./bot.js";
 export { createRng, scriptedRng } from "./rng.js";
 export type { Rng } from "./rng.js";

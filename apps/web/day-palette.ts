@@ -1,12 +1,12 @@
 import type { DayPalette } from "./day-theme";
 
 /**
- * 白天版调色表（欲罢不能，雪山夜色的蓝灰）。
+ * 白天版调色表（模板沿用欲罢不能的蓝灰；骷髅牌的烛光酒馆配色由界面阶段换）。
  * 深色底、面板、按钮 → 白底浅色；深色像素描边保留；浅色字 → 深色字。
  * 雪山场景（背景图、岩柱、登山者）和叠在场景上的提示条、横幅、按钮里的金色红色这些内容色不换。
  */
 export const palette: DayPalette = {
-  files: ["app-pixel.css", "cantstop.css"],
+  files: ["app-pixel.css", "board.css"],
   colors: {
     "#0c1120": "#ffffff", // 底色、输入框
     "#101729": "#f8f9fc", // 底色的棋盘纹
@@ -43,6 +43,6 @@ export const palette: DayPalette = {
     "--ok": "#1f8a45",
     "--bad": "#d1303f",
   },
-  // 雪山场景和叠在上面的提示条、横幅保持夜间的样子（字色由 theme-day.css 换回浅色）
-  keep: [".cs-stage", ".cs-ground", ".cs-prompt", ".cs-feedback", ".cs-banner"],
+  // 牌桌场景保持夜间样子的类名（界面阶段补）
+  keep: [],
 };

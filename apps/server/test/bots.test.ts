@@ -14,28 +14,47 @@ import {
 } from "@skull/game";
 
 // ---------- 每款游戏不一样的地方 ----------
-/** 测试里真人怎么走：从合法动作里挑一个（要保证对局能走完）。欲罢不能：推进完就收手，回合短。 */
+/** 测试里真人怎么走：骷髅牌——盖第 1 张就盖，轮到就开叫 1，加注就 pass，其余选第一个（对局短）；结算点继续，不亮牌。 */
 function humanMove(game: GameState, actions: GameCommand[]): GameCommand {
-  return game.stage === "decide" ? { type: "STOP" } : actions[0]!;
+  if (game.phase === "placeOrBid") return { type: "openBid", count: 1 };
+  if (game.phase === "bidding") return { type: "pass" };
+  if (game.phase === "roundEnd") return { type: "nextRound" };
+  return actions[0]!;
 }
-/** 这位玩家自己做了点什么（不是超时、不是轮到他）。 */
+/** 这位玩家自己做了点什么（不是超时、不是系统自动的）。 */
 function actedBy(room: LobbyRoomSnapshot, playerId: string): boolean {
+  if (room.game?.events.some((event) => event.type === "TimedOut" && event.player === playerId)) return false;
   return room.game?.events.some((event) => {
-    const type: string = event.type;
-    return "player" in event && event.player === playerId && type !== "TurnTimedOut" && type !== "TurnStarted";
+    switch (event.type) {
+      case "DiscPlaced":
+      case "BidOpened":
+      case "BidRaised":
+      case "Passed":
+      case "PlayerReady":
+      case "StackRevealed":
+        return event.player === playerId;
+      case "DiscRevealed":
+        return !event.auto && event.challenger === playerId;
+      case "FirstPlayerChosen":
+        return event.by === playerId;
+      default:
+        return false;
+    }
   }) === true;
 }
 /** 最小的房间人数选项、开局至少几人。 */
-const MIN_CAPACITY: Capacity = 2;
-const MIN_PLAYERS = 2;
+const MIN_CAPACITY: Capacity = 3;
+const MIN_PLAYERS = 3;
 /** 「一个人加满人机」用几人房；「加满后加不了」用几人房。 */
 const SOLO_CAPACITY: Capacity = 4;
 const FULL_TEST_CAPACITY: Capacity = 3;
 // ----------------------------------------
 
-// 人机立刻行动、每一步 300 ms 超时，测试才跑得快（服务端在导入时读这两个变量）。
+// 人机立刻行动、每一步 300 ms 超时、系统翻牌不停顿，测试才跑得快（服务端在导入时读这些变量）。
 process.env.BOT_DELAY_SCALE = "0";
 process.env.TURN_MS = "300";
+process.env.FLIP_MS = "0";
+process.env.ROUND_END_MS = "300";
 
 
 type TestSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
@@ -114,7 +133,7 @@ function autoplay(client: TestSocket): () => void {
   let sentFor = "";
   const handler = (room: LobbyRoomSnapshot) => {
     const game = room.game;
-    if (!game || game.phase === "finished") return;
+    if (!game || game.phase === "gameOver") return;
     const actions = legalActions(game, seatOf(client));
     const key = String(game.version);
     if (actions.length === 0 || sentFor === key) return;
@@ -174,13 +193,13 @@ describe("人机", () => {
 
     expect((await start(host)).ok).toBe(true);
     const stop = autoplay(host);
-    const finished = await updateWhere(host, (snapshot) => snapshot.game?.phase === "finished", 60_000);
+    const finished = await updateWhere(host, (snapshot) => snapshot.game?.phase === "gameOver", 60_000);
     stop();
     const bots = finished.members.filter((member) => member.bot).map((member) => member.id);
     expect(finished.rematch?.acceptedIds.sort()).toEqual(bots.sort());
 
     expect((await call<void>((ack) => host.emit("room:rematch", true, ack))).ok).toBe(true);
-    const again = await updateWhere(host, (snapshot) => snapshot.game !== undefined && snapshot.game.phase !== "finished" && !snapshot.rematch);
+    const again = await updateWhere(host, (snapshot) => snapshot.game !== undefined && snapshot.game.phase !== "gameOver" && !snapshot.rematch);
     expect(again.game!.players).toHaveLength(SOLO_CAPACITY);
   }, 90_000);
 
@@ -206,10 +225,10 @@ describe("人机", () => {
     const isAuto = (snapshot: LobbyRoomSnapshot) => snapshot.members.find((member) => member.id === idle.id)?.auto === true;
     const autoRoom = await updateWhere(idle, isAuto);
     const idleSeat = seatOf(idle);
-    expect(autoRoom.game!.events.some((event) => event.type === "TurnTimedOut" && event.player === idleSeat)).toBe(true);
+    expect(autoRoom.game!.events.some((event) => event.type === "TimedOut" && event.player === idleSeat)).toBe(true);
 
     // 托管后轮到他时没有倒计时，人机替他走：之后他的回合不再超时，而是真的行动
-    const hisTurn = await updateWhere(idle, (snapshot) => isAuto(snapshot) && snapshot.game?.players[snapshot.game.currentPlayer]?.id === idleSeat);
+    const hisTurn = await updateWhere(idle, (snapshot) => isAuto(snapshot) && snapshot.game?.turn === idleSeat);
     expect(hisTurn.turnRemainingMs).toBeUndefined();
     await updateWhere(idle, (snapshot) => actedBy(snapshot, idleSeat));
 
@@ -232,7 +251,7 @@ describe("人机", () => {
     leaver.disconnect();
 
     const played = await updateWhere(stayer, (snapshot) => actedBy(snapshot, leaverSeat));
-    expect(played.game!.events.some((event) => event.type === "TurnTimedOut")).toBe(false);
+    expect(played.game!.events.some((event) => event.type === "TimedOut")).toBe(false);
     expect(played.members.find((member) => member.playerId === leaverSeat)).toMatchObject({ connected: false });
 
     const back = await connect();

@@ -69,7 +69,8 @@ function OnlineRooms({ rooms, connected, busy, onJoin }: {
                     {player.isActive && <small className="turn">行动中</small>}
                     {player.isWinner && <small className="winner">胜者</small>}
                     {!player.connected && <small>离线</small>}
-                    {player.score !== undefined && <b>{player.score}<span> 峰</span></b>}
+                    {player.eliminated && <small>淘汰</small>}
+                    {player.score !== undefined && <b>{player.score}<span> 胜</span></b>}
                   </li>
                 ))}
               </ul>

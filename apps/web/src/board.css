@@ -1,0 +1,41 @@
+/*
+ * 调试牌桌的样式（引擎阶段放的，正式牌桌由界面阶段重做）。类名都以 sk- 开头。
+ * 颜色用 app-pixel.css 里的变量，白天版由 day-theme.ts 自动换色。
+ */
+.sk-screen { display: flex; flex-direction: column; gap: 8px; min-height: 100vh; padding: 8px; }
+.sk-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sk-turn { display: flex; gap: 12px; align-items: center; font-size: 16px; }
+.sk-timer { color: var(--gold); }
+.sk-timer.low { color: var(--bad); }
+.sk-topbar-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sk-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 12px; }
+@media (max-width: 900px) { .sk-layout { grid-template-columns: 1fr; } }
+.sk-table, .sk-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sk-prompt { font-size: 18px; padding: 6px 10px; background: #16203a; display: flex; gap: 12px; align-items: center; }
+.sk-prompt.mine { color: var(--gold); }
+.sk-feedback { margin: 0; }
+.sk-feedback.error { color: var(--bad); }
+.sk-center { display: flex; gap: 16px; flex-wrap: wrap; font-size: 16px; }
+.sk-center b { color: var(--gold); font-size: 20px; }
+.sk-seats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.sk-seat { background: #16203a; padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+.sk-seat.acting { box-shadow: inset 0 0 0 2px var(--gold); }
+.sk-seat.out { opacity: 0.5; }
+.sk-seat-head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.sk-tag { background: #263759; padding: 0 4px; }
+.sk-emote { color: var(--gold); }
+.sk-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.sk-label { min-width: 64px; color: var(--muted); }
+.sk-disc { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; background: #263759; }
+.sk-disc.rose { color: #ff8fa0; }
+.sk-disc.skull { color: #eef3fb; background: #3a2c10; }
+.sk-disc.lc { color: var(--gold); }
+.sk-disc.up { box-shadow: inset 0 0 0 2px var(--gold); }
+.sk-muted { color: var(--muted); }
+.sk-actions, .sk-emotes { display: flex; gap: 6px; flex-wrap: wrap; }
+.sk-panel { background: #16203a; padding: 8px; }
+.sk-panel h3 { margin: 0 0 4px; font-size: 14px; }
+.sk-panel p { margin: 2px 0; }
+.sk-log ul { margin: 0; padding-left: 16px; max-height: 260px; overflow: auto; }
+.sk-final ol { padding-left: 20px; }
+.sk-option { display: flex; gap: 6px; align-items: center; }

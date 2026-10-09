@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { CAPACITY_OPTIONS, type Capacity, type GameCommand, type LobbyRoomSnapshot, type PublicRoomSummary } from "@skull/game";
-import { climberArt, dieArt, sceneArt, SEATS } from "./art.js";
 import { useConfirm } from "./confirm.js";
 import GameBoard from "./GameBoard.js";
 import GameRules from "./GameRules.js";
@@ -25,7 +24,9 @@ function normalizeRoomCode(value: string): string {
 function App() {
   const [mode, setMode] = useState<EntryMode>("create");
   const [name, setName] = useState("");
-  const [capacity, setCapacity] = useState<Capacity>(2);
+  const [capacity, setCapacity] = useState<Capacity>(4);
+  // 开房选项：Last Chance 碟（默认关）
+  const [lastChance, setLastChance] = useState(false);
   const [confirmAction, confirmDialog] = useConfirm();
   // 白天 / 夜间画面：首页、等候房间、牌桌共用，顶栏按钮随时切换；和游戏中心、其他游戏共用同一个选择。
   const [theme, toggleTheme] = useTheme();
@@ -134,7 +135,7 @@ function App() {
     };
 
     if (mode === "create") {
-      socket.emit("room:create", { name: nickname, capacity }, complete);
+      socket.emit("room:create", { name: nickname, capacity, options: { lastChance } }, complete);
     } else {
       socket.emit("room:join", { name: nickname, code: roomCode }, complete);
     }
@@ -217,7 +218,7 @@ function App() {
     const players = room.game.players;
     const watched = players.some((player) => player.id === watchId) ? watchId : players[0]!.id;
     return (
-      <main className="app-shell cs-game">
+      <main className="app-shell sk-game">
         <GameBoard
           room={room}
           busy={busy}
@@ -264,7 +265,7 @@ function App() {
           onDissolve={dissolveRoom}
         />
         <RoomChat room={room} voice={voice} />
-        <footer className="page-footer">再掷一次，还是就此扎营？</footer>
+        <footer className="page-footer">玫瑰，还是骷髅？</footer>
         {confirmDialog}
       </main>
     );
@@ -283,18 +284,13 @@ function App() {
 
       <section className="welcome-grid">
         <div className="welcome-copy">
-          <div className="eyebrow"><span className="eyebrow-line" /> 在线对战 · 2–4 人 · 测试版</div>
+          <div className="eyebrow"><span className="eyebrow-line" /> 在线对战 · 3–6 人 · 测试版</div>
           <h1>骷髅牌</h1>
           <p className="welcome-description">
-            掷 4 颗骰子，两两分组，带着 3 个登山者往 2–12 号登山路上爬。
-            每爬一步都要选：再掷一次继续冒险，还是收手扎营保住进度？贪心爆掉，这回合就白爬了。
-            先登顶 3 条路的人获胜。创建一间私人房间，或输入房间码加入朋友的对局；人不够可以加人机。
+            每人 4 张背面一样的垫子：3 朵玫瑰、1 个骷髅。扣着往自己板上叠，再叫价「我能连翻几张都是玫瑰」。
+            叫得最高的人去翻，先翻自己的、再翻别人的，碰到骷髅就永久丢一张。成功两次，或者活到最后，就赢了。
+            创建一间私人房间，或输入房间码加入朋友的对局；人不够可以加人机。
           </p>
-          <img className="cs-hero" src={sceneArt.hero} alt="" />
-          <div className="cs-showcase" aria-hidden="true">
-            {SEATS.map((seat, index) => <img key={seat.key} src={climberArt(index)} alt="" />)}
-            {[3, 4, 5, 6].map((face) => <img key={face} className="cs-showcase-die" src={dieArt(face)} alt="" />)}
-          </div>
         </div>
 
         <section className="entry-card" aria-labelledby="entry-title">
@@ -358,7 +354,11 @@ function App() {
                     </button>
                   ))}
                 </div>
-                <p className="field-hint">至少 2 位玩家后，房主即可开始；空座位可以加人机。</p>
+                <label className="field-label field-label-spaced sk-option">
+                  <input type="checkbox" checked={lastChance} onChange={(event) => setLastChance(event.target.checked)} />
+                  Last Chance 碟（只剩 1 张时多给一张公开的玫瑰碟）
+                </label>
+                <p className="field-hint">至少 3 位玩家后，房主即可开始；空座位可以加人机。</p>
               </>
             ) : (
               <>
@@ -397,7 +397,7 @@ function App() {
         <div className="how-item"><span className="how-number">03</span><span>开始对局</span></div>
       </section>
       <OnlineRooms rooms={lobbyRooms} connected={connected} busy={busy} onJoin={joinListed} />
-      <footer className="page-footer">再掷一次，还是就此扎营？</footer>
+      <footer className="page-footer">玫瑰，还是骷髅？</footer>
     </main>
   );
 }
@@ -506,18 +506,19 @@ function RoomView({
                 </div>
               ))}
             </div>
-            <p className="field-hint">每一步限时 45 秒：没掷骰就超时跳过这回合，掷了骰子后超时自动收手。</p>
+            <p className="field-hint">盖第 1 张 20 秒、盖牌或开叫 25 秒、加注 20 秒、选板 20 秒；超时系统替你随机盖一张、开叫 1 或 pass，连续两次超时转人机托管。</p>
+            <GameOptionsPanel room={room} isHost={isHost} />
             <RoomSettingsPanel room={room} />
             <SeatSwitch room={room} />
             <div className="room-actions">
               {isHost ? (
-                <button className="primary-button" type="button" onClick={onStart} disabled={busy || room.members.length < 2}>
+                <button className="primary-button" type="button" onClick={onStart} disabled={busy || room.members.length < 3}>
                   {busy ? <><span className="spinner" /> 正在开始</> : "开始对局"}<span aria-hidden="true">↗</span>
                 </button>
               ) : (
                 <div className="host-wait-note"><span className="pulse-dot" /> {spectating ? "等房主开始，开始后在这里观战" : "等待房主开始对局"}</div>
               )}
-              {isHost && room.members.length < 2 && <p className="field-hint centered">还需要至少 {2 - room.members.length} 位玩家加入，也可以点空座位上的「加人机」。</p>}
+              {isHost && room.members.length < 3 && <p className="field-hint centered">还需要至少 {3 - room.members.length} 位玩家加入，也可以点空座位上的「加人机」。</p>}
             </div>
           </section>
         </div>
@@ -527,6 +528,21 @@ function RoomView({
       {notice && <p className="feedback feedback-success room-feedback" role="status">{notice}</p>}
       <div className="room-secure-note"><span>◇</span> {room.access.open ? "公开房间：首页列表里的人可以直接加入空座位。" : "邀请制：要有房间码才能加入；首页列表不显示房间码。"}</div>
     </section>
+  );
+}
+
+/** 开房选项：房主在等候时能改，其他人只看。 */
+function GameOptionsPanel({ room, isHost }: { room: LobbyRoomSnapshot; isHost: boolean }) {
+  const [error, setError] = useState("");
+  const toggle = () => socket.emit("room:options", { lastChance: !room.options.lastChance }, (response) => setError(response.ok ? "" : response.error));
+  return (
+    <div className="room-settings sk-options">
+      <label className="sk-option">
+        <input type="checkbox" checked={room.options.lastChance} disabled={!isHost} onChange={toggle} />
+        Last Chance 碟 <small>（{room.options.lastChance ? "开" : "关"}：只剩 1 张的人下一轮多拿一张公开的玫瑰碟）</small>
+      </label>
+      {error && <p className="feedback feedback-error">{error}</p>}
+    </div>
   );
 }
 

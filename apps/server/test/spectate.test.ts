@@ -16,16 +16,19 @@ import {
 
 // ---------- 每款游戏不一样的地方 ----------
 /** 最小的房间人数（对局要坐满才开始测）。 */
-const CAPACITY: Capacity = 2;
-/** 这款游戏有没有藏起来的信息。 */
-const HIDDEN_INFO = false;
-/** 开局后先走几步（每步选轮到的人的第一个合法动作），让场上有藏起来的牌。 */
+const CAPACITY: Capacity = 3;
+/** 这款游戏有没有藏起来的信息：每人手里、板上扣着的垫子。 */
+const HIDDEN_INFO = true;
+/** 开局后先走几步（每步选轮到的人的第一个合法动作）：三个人各盖第 1 张，再盖一张，场上就有扣着的垫子。 */
 const STEPS = 4;
-/** 只在服务端的字段（牌堆顺序、种子等），观战的人永远拿不到。 */
-const SERVER_ONLY = ["deck", "seed"];
-/** 这份状态里看得到几样藏起来的东西（手牌之类）。 */
-function secretsSeen(_game: GameState): number {
-  return 0;
+/** 只在服务端的字段（种子、随机数状态、动作序列），观战的人永远拿不到。 */
+const SERVER_ONLY = ["seed", "rngState", "log"];
+/** 这份状态里看得到几张扣着的垫子的牌面（手里的、板上没翻开的；Last Chance 碟本来就公开，不算）。 */
+function secretsSeen(game: GameState): number {
+  return game.players.reduce((total, player) =>
+    total
+    + player.hand.filter((disc) => disc.face !== undefined && !disc.lastChance).length
+    + player.stack.filter((disc) => disc.face !== undefined && !disc.revealed && !disc.lastChance).length, 0);
 }
 // ----------------------------------------
 

@@ -321,7 +321,7 @@ export function HomeScreen(props: HomeScreenProps) {
       <header className="topbar">
         <Brand />
         <div className="topbar-right">
-          <a className="center-link" href={CENTER_URL}>← 游戏中心</a>
+          <a className="center-link" href={CENTER_URL}>← <span className="sk-long">游戏中心</span><span className="sk-short">大厅</span></a>
           <GameRules />
           {props.themeToggle}
           <ConnectionStatus connected={props.connected} />

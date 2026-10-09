@@ -341,6 +341,13 @@
 
 /* ---------------------------------------------------------------- 首页 */
 .app-shell.sk-home { width: min(1280px, calc(100% - 48px)); }
+@media (min-width: 1600px) and (min-height: 900px) {
+  .app-shell.sk-home { width: min(1560px, calc(100% - 96px)); }
+  .sk-home .welcome-grid { grid-template-columns: minmax(0, 1fr) 520px; gap: 96px; }
+  .app-shell.sk-home .welcome-copy h1 { font-size: 96px; }
+  .app-shell.sk-home .welcome-description, .sk-home-points { font-size: 24px; line-height: 1.6; }
+  .sk-home-points li > :first-child { width: 48px; }
+}
 .sk-home .welcome-grid { grid-template-columns: minmax(0, 1fr) 440px; grid-template-rows: minmax(0, 1fr); align-items: center; gap: 48px; padding: 24px 0; }
 .sk-home .welcome-copy { display: flex; flex-direction: column; min-height: 0; padding: 0; }
 .sk-home-points { display: grid; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; color: var(--muted); font-size: 12px; }
@@ -354,6 +361,8 @@
 .sk-home-side { display: flex; flex-direction: column; gap: 16px; min-width: 0; min-height: 0; max-height: 100%; }
 .sk-home-side .entry-card { flex: 0 0 auto; }
 .app-shell.sk-home .entry-card .primary-button { min-height: 56px; font-size: 24px; }
+.sk-short { display: none; }
+@media (max-width: 559px) { .app-shell.sk-home .sk-short { display: inline; } }
 .sk-home .capacity-options { grid-template-columns: repeat(4, 1fr); }
 .app-shell .sk-lc-toggle { margin-top: 12px; width: 100%; justify-content: flex-start; }
 .app-shell .sk-lc-toggle img { width: 32px; height: 36px; }
@@ -388,7 +397,7 @@
   .sk-home .sk-home-side { display: contents; }
   .sk-home .entry-card { order: 2; }
   .app-shell.sk-home .sk-hero { order: 3; margin: 0 auto; }
-  .sk-home-points { order: 4; }
+  .sk-home .welcome-copy > .sk-home-points { order: 4; }
   .sk-home .online-rooms { order: 5; }
   .app-shell.sk-home .welcome-copy h1 { margin: 0; }
   .app-shell.sk-home :is(.eyebrow, .section-kicker, .step-indicator, .entry-footnote) { display: none; }
@@ -397,7 +406,8 @@
 }
 @media (max-width: 559px) {
   .app-shell.sk-home .welcome-description { display: none; }
-  .app-shell.sk-home .center-link { display: none; }
+  .app-shell.sk-home .sk-long { display: none; }
+  .app-shell.sk-home .brand-name span { display: none; }
   .app-shell.sk-home .entry-card-heading { display: none; }
   .app-shell.sk-home .connection-status { display: none; }
 }
@@ -444,8 +454,17 @@
   .app-shell.sk-room .room-chat-list { min-height: 40px; }
 }
 @media (min-width: 760px) and (max-width: 1199px) {
-  .sk-room .room-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
-  .sk-room-chat { grid-column: 1 / -1; display: none; }
+  .sk-room .room-grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "code players" "chat players"; }
+  .sk-room .room-code-panel { grid-area: code; }
+  .sk-room .player-panel { grid-area: players; }
+  .sk-room-chat { grid-area: chat; min-height: 0; }
+  .sk-room .sk-room-cheat, .sk-room .room-code-panel .field-hint { display: none; }
+  .app-shell.sk-room .room-chat-list { min-height: 48px; }
+}
+@media (min-width: 1600px) and (min-height: 900px) {
+  .app-shell.sk-room { width: min(1680px, calc(100% - 96px)); }
+  .sk-room .room-grid { align-items: stretch; }
+  .sk-room .room-code-panel { justify-content: flex-start; }
 }
 @media (max-width: 759px) {
   .app-shell.sk-room { width: calc(100% - 24px); }

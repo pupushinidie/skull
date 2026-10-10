@@ -277,6 +277,18 @@ const game = buildGame({
 - **提示**：`GameBoard` 的 `hint` 属性显示一句提示（教程的「提示」按钮用 `botHint(view, me, () => 0.99)` 的 `reason`）；正式对局没有传。
 - 截图量化脚本：`~/projects/qa-reports/tools/skull-scenes.sh`（预览页场景 × 四种尺寸 × 两套主题）、`skull-play.mjs`（网页上真打一整局）。
 
+## 新手教程（apps/web/src/tutorial）
+
+做法照站内统一的教程方案（`~/projects/pipeline/handbook/tutorial-notes.md`，参考实现欲罢不能）：不连服务器，浏览器里直接跑规则引擎。
+- 剧本 `script.ts`：3 人（你 + 咕噜一号 + 咕噜二号）、4 轮、55 步（19 步自己动手、15 步看咕噜走、21 步讲解），约 4–5 分钟；第 2 轮翻到骷髅失牌、第 3 轮拿骷髅当诱饵让咕噜一号栽跟头，都由剧本随机保证。剧本单测 `script.test.ts`。
+- 教练层（咕噜嘎、对话框、小贴士、本机记录）从欲罢不能复制，没改逻辑；本游戏样式在 `sk-tutorial.css`。`TutorialMode.tsx` 接剧本和练习局人机；`hints.ts` 是「提示」和「第一次遇到」小贴士。
+- 入口：首页邀请卡；等候房间电脑上在标题右边、手机在房间码下面（不离开房间，开局自动回牌桌）。地址带 `?tutorial` 直接打开。学完一键开人机练习局，可以点「提示」（键盘 H）。
+- 走查：`node ~/projects/qa-reports/tools/skull-tut.mjs <输出目录> flow|skip|waiting|room <1440|1920|1024|390> <night|day>`（`SHORT=1` 练习局只看开头）。
+
+## 美术
+
+正式美术（PixelLab，「烛光地下酒馆」）在 `art/out/final/`，按 `art/spec.md` 同名覆盖到 `apps/web/public/art/`；简洁版原图在 `art/simple/`。`python art/simple.py --check` 列出还是简洁版、缺文件、尺寸不对的图（应该全是 0）。
+
 ## 目录
 
 | 位置 | 内容 |

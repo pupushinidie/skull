@@ -53,3 +53,10 @@
   .tut-dock .tut-say { line-height: 1.3; }
   .tut-dock .tut-note { line-height: 1.5; }
 }
+
+/* 「跳过教程」任何尺寸都不折行（进度格子很长时会被挤成两行） */
+.app-shell .tut-link { white-space: nowrap; }
+
+/* 剧本里赢下整局那一步：结算框贴上边，咕噜嘎的对话框放在它下面，不压住名次 */
+.tut-script .gm-modal-backdrop.sk-final-backdrop { align-items: start; padding-top: 16px; }
+.tut-invite-copy strong { text-wrap: balance; }

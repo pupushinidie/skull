@@ -365,6 +365,7 @@
   .sk-home .welcome-grid { grid-template-columns: minmax(0, 1fr) 520px; gap: 96px; }
   .app-shell.sk-home .welcome-copy h1 { font-size: 96px; }
   .app-shell.sk-home .welcome-description, .sk-home-points { font-size: 24px; line-height: 1.6; }
+  .app-shell.sk-home .welcome-description { max-width: 760px; }
   .sk-home-points li > :first-child { width: 48px; }
 }
 .sk-home .welcome-grid { grid-template-columns: minmax(0, 1fr) 440px; grid-template-rows: minmax(0, 1fr); align-items: center; gap: 48px; padding: 24px 0; }
@@ -393,6 +394,9 @@
   .app-shell.sk-home { height: 100vh; height: 100dvh; min-height: 0; }
   .sk-home .topbar { flex: 0 0 auto; height: 64px; }
   .sk-home .welcome-grid { flex: 1 1 auto; min-height: 0; }
+  /* 左栏占满整行高度，放不下时（比如加了教程邀请卡）首页大图先变矮（cover 裁掉一点），不把整页撑出滚动 */
+  .sk-home .welcome-copy { align-self: stretch; justify-content: center; }
+  .sk-hero { flex: 0 1 288px; align-self: flex-start; width: auto; max-width: 512px; min-height: 144px; }
 }
 @media (min-width: 900px) and (max-height: 820px) {
   .app-shell.sk-home .welcome-copy h1 { margin: 12px 0; font-size: 48px; }
@@ -573,4 +577,22 @@
   .app-shell .sk-chat .room-chat-list { min-height: 40px; max-height: 120px; }
   .app-shell .sk-chat .room-chat-heading span { display: none; }
   .sk-log { min-height: 48px; }
+}
+
+/* 等候房间的教程入口：电脑上压成一行放在标题右边（房间码、玩家两栏本来就满），手机放在房间码一栏底下 */
+.sk-invite-slot.in-heading { display: none; }
+@media (min-width: 760px) {
+  .sk-invite-slot.in-code { display: none; }
+  .sk-room .room-heading { gap: 16px; }
+  .sk-invite-slot.in-heading { display: block; flex: 0 1 auto; min-width: 0; margin-left: auto; }
+  .sk-invite-slot.in-heading .tut-invite { margin: 0; padding: 4px 6px 4px 8px; gap: 12px; }
+  .sk-invite-slot.in-heading .tut-invite img { width: 32px; height: 32px; }
+  .sk-invite-slot.in-heading .tut-invite-copy { display: flex; align-items: baseline; gap: 12px; min-width: 0; }
+  .sk-invite-slot.in-heading .tut-invite-copy strong { white-space: nowrap; }
+  .sk-invite-slot.in-heading .tut-invite-copy span { white-space: nowrap; }
+  .app-shell .sk-invite-slot.in-heading .tut-invite .tut-invite-go { padding: 0 12px; line-height: 36px; }
+  .app-shell .sk-invite-slot.in-heading .tut-again { width: auto; margin: 0; white-space: nowrap; }
+}
+@media (min-width: 760px) and (max-width: 1365px) {
+  .sk-invite-slot.in-heading .tut-invite-copy span { display: none; }
 }

@@ -318,6 +318,7 @@ function RoomPreview() {
       connected
       themeToggle={<ThemeToggle theme={theme} onToggle={toggleTheme} />}
       chat={<RoomChat room={room} voice={voice} />}
+      {...(params.get("tut") === "1" ? { onTutorial: () => undefined } : {})}
       onCopyCode={() => undefined}
       onLeave={() => undefined}
       onStart={() => undefined}

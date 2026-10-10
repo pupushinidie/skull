@@ -577,6 +577,16 @@ function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onK
   const [optionError, setOptionError] = useState("");
   const toggleLastChance = () => socket.emit("room:options", { lastChance: !room.options.lastChance }, (response) => setOptionError(response.ok ? "" : response.error));
   const sendEmote = (id: EmoteId) => socket.emit("room:emote", { id }, (response) => setEmoteError(response.ok ? "" : response.error));
+  // 教程入口：电脑上放在标题那一行（压成一行，不占栏里的高度）；手机放在房间码一栏底下。CSS 只显示其中一个。
+  const roomInvite = onTutorial && !spectating ? (
+    <TutorialInvite
+      record={readTutorial(GAME_ID)}
+      title="等人的时候，先学一下？"
+      text="咕噜嘎带你在真牌桌上打一局。不会离开房间，房主一开局就自动回来。"
+      again="再看一遍新手教程（不离开房间）"
+      onOpen={onTutorial}
+    />
+  ) : null;
 
   return (
     <section className="room-layout">
@@ -586,6 +596,7 @@ function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onK
           <h1>{spectating ? "你在观战。" : room.status === "waiting" ? "酒馆里点上了蜡烛。" : "好戏即将开始。"}</h1>
           <p>{spectating ? "等房主开始对局；有空座位时可以坐下一起玩。" : "把房间码分享给朋友，等大家就位后开始；空座位可以加人机。"}</p>
         </div>
+        {roomInvite && <div className="sk-invite-slot in-heading">{roomInvite}</div>}
         <div className="room-heading-actions">
           {isHost && <button className="quiet-button danger" type="button" onClick={onDissolve} disabled={busy}>解散房间</button>}
           <button className="quiet-button" type="button" onClick={onLeave} disabled={busy || (room.status === "playing" && !spectating)}>
@@ -632,15 +643,7 @@ function RoomView({ room, busy, error, notice, onCopyCode, onLeave, onStart, onK
                 <span>成功两次就赢，丢光出局</span>
               </div>
             </div>
-            {onTutorial && !spectating && (
-              <TutorialInvite
-                record={readTutorial(GAME_ID)}
-                title="等人的时候，先学一下？"
-                text="咕噜嘎带你在真牌桌上打一局。不会离开房间，房主一开局就自动回来。"
-                again="再看一遍新手教程（不离开房间）"
-                onOpen={onTutorial}
-              />
-            )}
+            {roomInvite && <div className="sk-invite-slot in-code">{roomInvite}</div>}
           </section>
 
           <section className="room-panel player-panel">

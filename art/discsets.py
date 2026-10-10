@@ -23,7 +23,7 @@ R1 = OUT / "r1"
 def cand(batch: str, i: int) -> Image.Image:
     p = R1 / batch / (f"{batch}-{i}.png" if i else f"{batch}.png")
     im = Image.open(p).convert("RGBA")
-    if batch == "disc-skull":
+    if batch in ("disc-skull", "disc-skull3"):
         im = ImageChops.offset(im, 16, 0)   # 这一批左右错了半张，卷回来
     return im
 
@@ -70,9 +70,9 @@ def clear_motif(disc: Image.Image) -> Image.Image:
     return out
 
 
-def skull_motif(i: int) -> Image.Image:
-    """从 disc-skull 候选里抠出骷髅（骨白色的块 + 里面的眼睛、鼻子、牙缝），外面加 1px 描边。"""
-    im = cand("disc-skull", i)
+def skull_motif(i: int, batch: str = "disc-skull", rmax: float = 10) -> Image.Image:
+    """从 disc-skull / disc-skull3 候选里抠出骷髅（骨白色的块 + 里面的眼睛、鼻子、牙缝），外面加 1px 描边。"""
+    im = cand(batch, i)
     px = im.load()
     W, H = im.size
     bone = set()
@@ -80,7 +80,7 @@ def skull_motif(i: int) -> Image.Image:
         for x in range(W):
             c = px[x, y]
             h, s, v = hsv(c)
-            if c[3] and v > 0.62 and s < 0.38 and math.hypot(x + 0.5 - 16, y + 0.5 - 16) < 10:
+            if c[3] and v > 0.62 and s < 0.38 and math.hypot(x + 0.5 - 16, y + 0.5 - 16) < rmax:
                 bone.add((x, y))
     # 骷髅的包围区域：从外面洪水填充非骨像素，填不到的就是骷髅里面（眼睛、鼻子）
     xs = [p[0] for p in bone]
@@ -147,10 +147,11 @@ def sparkle(disc: Image.Image) -> Image.Image:
     return out
 
 
-def build(back: int, rose: int, skull: int, lc: int, skull_dy: int = 0) -> dict[str, Image.Image]:
+def build(back: int, rose: int, skull: int, lc: int, skull_dy: int = 0, skull_batch: str = "disc-skull",
+          skull_r: float = 10) -> dict[str, Image.Image]:
     rose_disc = discs.from_candidate(cand("disc-rose", rose), "copper")
     skull_disc = clear_motif(rose_disc)
-    m = skull_motif(skull)
+    m = skull_motif(skull, skull_batch, skull_r)
     skull_disc.alpha_composite(m, (16 - m.width // 2, 16 - m.height // 2 + skull_dy))
     lc_disc = discs.from_candidate(cand("disc-lc", lc), "silver")
     return {
@@ -166,6 +167,10 @@ SETS = {
     "A": dict(back=4, rose=0, skull=13, lc=9),
     "B": dict(back=20, rose=5, skull=5, lc=2),
     "C": dict(back=36, rose=41, skull=51, lc=33),
+    # 2026-10-10：骷髅换成 disc-skull3 的大骷髅（占满内圈）
+    "E": dict(back=4, rose=0, skull=56, lc=9, skull_batch="disc-skull3", skull_r=11.5),
+    "F": dict(back=4, rose=0, skull=58, lc=9, skull_batch="disc-skull3", skull_r=11.5),
+    "G": dict(back=36, rose=41, skull=57, lc=33, skull_batch="disc-skull3", skull_r=11.5),
 }
 
 ORDER = ["back", "rose", "skull", "lc-down", "lc-up"]

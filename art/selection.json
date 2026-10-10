@@ -1,0 +1,239 @@
+{
+  "note": "骷髅牌正式美术的选择。每组的选项和构造方法见 art/final.py 的 GROUPS；改了这里跑 python art/final.py 重新导出 art/out/final。",
+  "choice": {
+    "discs": "E",
+    "mats": "s522",
+    "scene-night": "N1",
+    "scene-day": "D1",
+    "hero": "hero-c-s4245",
+    "icons": "A",
+    "lantern": "18",
+    "candle": "17",
+    "trophy": "s603",
+    "chrome": "code",
+    "avatars": "A",
+    "fx": "code",
+    "emote-rose": "code",
+    "emote-skull": "code",
+    "emote-taunt": "px1",
+    "emote-shrug": "code",
+    "emote-think": "px2dots",
+    "emote-laugh": "code",
+    "emote-sweat": "px2",
+    "emote-shock": "code"
+  },
+  "options": {
+    "discs": {
+      "E": "推荐：同一个外圈和描边，骷髅是大号卡通骷髅、占满内圈（disc-skull3 #56），1× 也是「暗底上一团白」；玫瑰最亮最圆",
+      "A": "同一套外圈，骷髅小一号（disc-skull #13），1× 时和玫瑰差别没那么大",
+      "G": "背面漩涡更细、玫瑰带茎、骷髅大（#57）；玫瑰在 1× 只剩一个小红点",
+      "simple": "现在线上的代码简洁版"
+    },
+    "mats": {
+      "s522": "推荐：皮革纹路干净，花面金线框 + 四角和左右小玫瑰，中间暗纹玫瑰；6 色只换皮革和缝线",
+      "s521": "皮革上有一道斜光，花面的中间是漩涡；个别座位四角玫瑰旁边留了一点红皮革",
+      "s523": "花面中间的玫瑰有亮红的点，换色后在蓝绿座位上很跳",
+      "simple": "现在线上的代码简洁版"
+    },
+    "scene-night": {
+      "N1": "推荐：四角蜡烛、桌面铺满中间、只在边角放玫瑰和杯子，没有字",
+      "N2": "N2 一张右边和下面有两张带涂画的纸（像字，没用）；另一张中间有几团光斑",
+      "N3": "桌子偏小，两边露地板和椅子多",
+      "simple": "现在线上的代码简洁版"
+    },
+    "scene-day": {
+      "D1": "推荐：蜂蜜色桌面铺满整幅，左上窗光斜照，玫瑰花瓣在右下角，右上一张空白纸",
+      "D2": "上面露窗户和椅子，桌子只占中间一部分",
+      "D3": "桌子偏右、偏小",
+      "simple": "现在线上的代码简洁版"
+    },
+    "hero": {
+      "hero-c-s4245": "推荐：斜俯视的酒馆桌，皮垫板上一摞刻漩涡的黄铜垫子、一枚玫瑰、一枚大眼骷髅，蜡烛照着",
+      "hero-s4243": "构图类似但垫子摞得太高、像一摞硬币",
+      "hero-s4244": "垫子正面朝上，背面花纹像字母",
+      "simple": "现在线上的代码简洁版"
+    },
+    "icons": {
+      "A": "推荐：PixelLab 小图（铃、钥匙、手掌、玫瑰、眼睛、垫子、一摞垫子）+ 代码画的已盖好 / LC 碟 / 沙漏",
+      "B": "同一批里的第二选择",
+      "simple": "现在线上的代码简洁版"
+    },
+    "lantern": {
+      "18": "推荐：有提环、火苗清楚",
+      "28": "灯罩太亮、轮廓糊",
+      "10": "没有提环",
+      "simple": "简洁版"
+    },
+    "candle": {
+      "17": "推荐：PixelLab 蜡烛 + 代码逐帧画火苗和青烟（手册：16px 火苗用 animate 会画成十字）",
+      "16": "蜡身更宽，烛台小",
+      "33": "蜡身歪",
+      "simple": "简洁版"
+    },
+    "trophy": {
+      "s603": "推荐：金杯插一朵带叶子的红玫瑰，深色描边清楚",
+      "s602": "玫瑰像一团花球",
+      "s604": "杯子太大、玫瑰看不清",
+      "simple": "简洁版"
+    },
+    "chrome": {
+      "code": "推荐：代码画的新版（缎带燕尾带折痕、气泡带光影、深木边框黄铜包角）。PixelLab 出的缎带没有描边、是渐变色，没用",
+      "simple": "简洁版"
+    },
+    "avatars": {
+      "A": "推荐：同一种画法（正面、圆脸、大眼），狐狸穿围裙，没有帽子道具",
+      "B": "第二选择：蛤蟆张嘴笑、乌鸦戴帽子",
+      "C": "第三选择",
+      "simple": "简洁版"
+    },
+    "fx": {
+      "code": "推荐：代码画（冲击环、花瓣、火花代码画最稳），按定稿配色",
+      "simple": "简洁版"
+    },
+    "emote-rose": {
+      "code": "推荐：花头左右轻晃，掉一片花瓣",
+      "px1": "PixelLab 动画：几乎不动，有一颗白色杂点",
+      "px2": "PixelLab 动画：多了几颗白色杂点",
+      "simple": "简洁版"
+    },
+    "emote-skull": {
+      "code": "推荐：下巴咔哒开合、头往上弹一下",
+      "px1": "PixelLab 动画：头顶冒出一个红点（坏帧）",
+      "px2": "PixelLab 动画：头顶长出粉色小块",
+      "simple": "简洁版"
+    },
+    "emote-taunt": {
+      "px1": "推荐：PixelLab 动画，眉毛一挑一挑、嘴角歪笑",
+      "px2": "PixelLab 动画：眯眼挤眼",
+      "code": "代码：只是上下弹",
+      "simple": "简洁版"
+    },
+    "emote-shrug": {
+      "code": "推荐：两只小手一耸一耸",
+      "px1": "PixelLab 动画：第 2 帧脸被拉长",
+      "px2": "PixelLab 动画：第 2 帧脸压扁、露牙",
+      "simple": "简洁版"
+    },
+    "emote-think": {
+      "px2dots": "推荐：PixelLab 托下巴动作 + 代码画的三个点依次出现",
+      "px2": "只有托下巴，没有点",
+      "code": "代码：只有三个点",
+      "simple": "简洁版"
+    },
+    "emote-laugh": {
+      "code": "推荐：整张脸上下抖，眼泪跟着弹",
+      "px2": "PixelLab 动画：眼泪拉成细长线",
+      "px1": "PixelLab 动画：第 1 帧脸变形",
+      "simple": "简洁版"
+    },
+    "emote-sweat": {
+      "px2": "推荐：PixelLab 动画，眼睛乱瞟、汗珠上下动",
+      "code": "代码：只有汗珠往下滑 3 像素",
+      "px1": "PixelLab 动画：第 2 帧脸变形",
+      "simple": "简洁版"
+    },
+    "emote-shock": {
+      "code": "推荐：瞪眼 O 嘴，整个往上一跳再落下",
+      "px1": "PixelLab 动画：嘴形乱变",
+      "px2": "PixelLab 动画：嘴形乱变",
+      "simple": "简洁版"
+    }
+  },
+  "sources": {
+    "discs": "out/discs/set-<选项>-*.png（discsets.py 拼，候选在 out/r1/disc-*）",
+    "mats": "out/mats/pair-<选项>/（mats_build.py，候选 out/r1/pixflux/mat-*-i-*）",
+    "scene-night": {
+      "N1": [
+        "night-b-s4311",
+        "night-c-s4601"
+      ],
+      "N2": [
+        "night-b-s4312",
+        "night-a-s4301"
+      ],
+      "N3": [
+        "night-c-s4602",
+        "night-a-s4302"
+      ]
+    },
+    "scene-day": {
+      "D1": [
+        "day-c-s4501",
+        "day-c-s4503"
+      ],
+      "D2": [
+        "day-a-s4401",
+        "day-c-s4502"
+      ],
+      "D3": [
+        "day-b-s4411",
+        "day-a-s4402"
+      ]
+    },
+    "icons": {
+      "A": {
+        "disc": [
+          "icon-d",
+          38
+        ],
+        "stack": [
+          "icon-d",
+          10
+        ],
+        "bell": [
+          "icon-a",
+          14
+        ],
+        "pass": [
+          "icon-b",
+          45
+        ],
+        "key": [
+          "icon-a",
+          25
+        ],
+        "rose": [
+          "icon-c",
+          10
+        ],
+        "eye": [
+          "icon-b",
+          33
+        ]
+      },
+      "B": {
+        "disc": [
+          "icon-d",
+          29
+        ],
+        "stack": [
+          "icon-d",
+          58
+        ],
+        "bell": [
+          "icon-a",
+          30
+        ],
+        "pass": [
+          "icon-b",
+          44
+        ],
+        "key": [
+          "icon-a",
+          15
+        ],
+        "rose": [
+          "icon-c",
+          39
+        ],
+        "eye": [
+          "icon-b",
+          49
+        ]
+      }
+    },
+    "avatars": "avatars_build.py PICKS（A/B/C = 每只动物第 1/2/3 个候选）",
+    "emotes": "out/emotes/cand/<id>/<选项>.png（emotes_build.py；首帧见 r5.EMO）",
+    "candle": "candles.py（out/r1/candle/candle-<选项>.png + 代码火苗）"
+  }
+}

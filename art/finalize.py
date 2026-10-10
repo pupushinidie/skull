@@ -59,7 +59,7 @@ def check(root: pathlib.Path, rel: str) -> list[str]:
         worst = max(vs0)
         if worst < 0.03:
             problems.append(f"太静（最大变化 {worst:.1%}）")
-        if worst > 0.6 and rel != "fx/sparkle.png":
+        if worst > 0.6 and rel not in ("fx/sparkle.png", "fx/petals.png", "ui/thinking.png"):  # 粒子满屏飘、沙漏整个翻转，本来就整帧都变
             problems.append(f"走形?（最大变化 {worst:.1%}）")
         seam = diff_ratio(fr[-1], fr[0])
         if seam > max(steps) * 1.5 + 0.02:
@@ -75,7 +75,7 @@ def check(root: pathlib.Path, rel: str) -> list[str]:
         for idx, face in ((0, back), (n - 1, front)):
             ref = Image.new("RGBA", fr[0].size, (0, 0, 0, 0))
             ref.alpha_composite(Image.open(root / "discs" / f"{face}.png").convert("RGBA"), (0, 4))
-            if ImageChops.difference(ref, fr[idx]).getbbox():
+            if ImageChops.difference(ref, fr[idx]).getbbox(alpha_only=False):
                 problems.append(f"第 {idx} 帧和 discs/{face} 不一样")
     info = f"帧 {n}，和首帧比最大 {max(vs0):.1%}，相邻最大 {max(steps):.1%}"
     return problems or [f"ok（{info}）"]

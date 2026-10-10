@@ -16,3 +16,86 @@
 {"time": "2026-10-09 19:16:12", "name": "mat2-flower-s513", "endpoint": "/create-image-pixflux", "usage": {"type": "usd", "usd": 0.007716105116738214}, "seconds": 50.7}
 {"time": "2026-10-09 19:17:24", "name": "night-a-s4301", "endpoint": "/create-image-pixen", "usage": {"type": "usd", "usd": 0.01071030722724067}, "seconds": 72.0}
 {"time": "2026-10-09 19:18:32", "name": "night-a-s4302", "endpoint": "/create-image-pixen", "usage": {"type": "usd", "usd": 0.010052963627709282}, "seconds": 68.0}
+{"time": "2026-10-10 09:27:50", "name": "night-b-s4311", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 46.2}
+{"time": "2026-10-10 09:28:03", "name": "day-a-s4401", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 59.3}
+{"time": "2026-10-10 09:28:21", "name": "day-b-s4411", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 76.7}
+{"time": "2026-10-10 09:28:56", "name": "night-b-s4312", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 65.9}
+{"time": "2026-10-10 09:29:07", "name": "day-b-s4412", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 45.8}
+{"time": "2026-10-10 09:29:17", "name": "day-a-s4402", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 73.3}
+{"time": "2026-10-10 09:30:14", "name": "hero-s4243", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 77.5}
+{"time": "2026-10-10 09:30:21", "name": "avatar-b", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 196.8, "status": "completed"}
+{"time": "2026-10-10 09:30:21", "name": "avatar-a", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 196.9, "status": "completed"}
+{"time": "2026-10-10 09:30:41", "name": "emote-face", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 216.4, "status": "completed"}
+{"time": "2026-10-10 09:31:10", "name": "hero-s4244", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 56.3}
+{"time": "2026-10-10 09:31:40", "name": "emote-skull", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 143.4, "status": "completed"}
+{"time": "2026-10-10 09:31:42", "name": "emote-rose", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 155.2, "status": "completed"}
+{"time": "2026-10-10 09:32:14", "name": "trophy-s601", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 32.5}
+{"time": "2026-10-10 09:32:34", "name": "trophy-s602", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 19.7}
+{"time": "2026-10-10 09:32:58", "name": "icon-a", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 157.1, "status": "completed"}
+{"time": "2026-10-10 09:33:00", "name": "icon-b", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 159.2, "status": "completed"}
+{"time": "2026-10-10 09:33:03", "name": "icon-c", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 142.1, "status": "completed"}
+{"time": "2026-10-10 09:33:13", "name": "ribbon-s611", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 14.6}
+{"time": "2026-10-10 09:33:14", "name": "candle", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 124.1, "status": "completed"}
+{"time": "2026-10-10 09:33:22", "name": "cover-b-s811", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 19.4}
+{"time": "2026-10-10 09:33:24", "name": "trophy-s603", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 50.4}
+{"time": "2026-10-10 09:33:32", "name": "ribbon-s612", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 18.9}
+{"time": "2026-10-10 09:33:40", "name": "cover-c-s811", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 25.9}
+{"time": "2026-10-10 09:33:40", "name": "cover-b-s812", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 18.0}
+{"time": "2026-10-10 09:33:40", "name": "cover-a-s811", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 40.3}
+{"time": "2026-10-10 09:33:44", "name": "trophy-s604", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 19.1}
+{"time": "2026-10-10 09:33:49", "name": "ribbon-s613", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 17.9}
+{"time": "2026-10-10 09:33:57", "name": "lantern", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 137.1, "status": "completed"}
+{"time": "2026-10-10 09:33:59", "name": "cover-a-s812", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 18.1}
+{"time": "2026-10-10 09:34:00", "name": "cover-c-s812", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 19.9}
+{"time": "2026-10-10 09:34:07", "name": "mat-blank-i-s521", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 17.2}
+{"time": "2026-10-10 09:34:12", "name": "mat-flower-i-s521", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 15.0}
+{"time": "2026-10-10 09:34:15", "name": "mat2-flower-i-s531", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 15.2}
+{"time": "2026-10-10 09:34:21", "name": "mat-blank-i-s522", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 14.5}
+{"time": "2026-10-10 09:34:23", "name": "mat2-blank-i-s531", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 24.5}
+{"time": "2026-10-10 09:34:26", "name": "mat-flower-i-s522", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 13.6}
+{"time": "2026-10-10 09:34:40", "name": "mat-flower-i-s523", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 14.1}
+{"time": "2026-10-10 09:34:40", "name": "mat2-blank-i-s532", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 17.2}
+{"time": "2026-10-10 09:34:42", "name": "mat2-flower-i-s532", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 26.7}
+{"time": "2026-10-10 09:34:44", "name": "mat-blank-i-s523", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 22.5}
+{"time": "2026-10-10 09:35:05", "name": "hero-c-s4245", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 84.6}
+{"time": "2026-10-10 09:35:05", "name": "disc-skull2", "endpoint": "/generate-image-v2", "usage": {"type": "usd", "usd": 0.0}, "seconds": 81.2, "status": "failed"}
+{"time": "2026-10-10 09:37:15", "name": "icon-d", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 155.0, "status": "completed"}
+{"time": "2026-10-10 09:40:47", "name": "avatar-toad", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 125.0, "status": "completed"}
+{"time": "2026-10-10 09:40:58", "name": "emo-taunt", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 136.4, "status": "completed"}
+{"time": "2026-10-10 09:41:03", "name": "emo-sweat", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 141.6, "status": "completed"}
+{"time": "2026-10-10 09:41:08", "name": "avatar-crow", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 146.2, "status": "completed"}
+{"time": "2026-10-10 09:41:21", "name": "avatar-fox", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 159.0, "status": "completed"}
+{"time": "2026-10-10 09:41:21", "name": "emo-shrug", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 159.2, "status": "completed"}
+{"time": "2026-10-10 09:41:21", "name": "emo-think", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 159.8, "status": "completed"}
+{"time": "2026-10-10 09:41:42", "name": "emo-laugh", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 180.9, "status": "completed"}
+{"time": "2026-10-10 09:41:44", "name": "cover-d-s821", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 23.0}
+{"time": "2026-10-10 09:42:06", "name": "day-c-s4501", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 58.8}
+{"time": "2026-10-10 09:42:07", "name": "cover-d-s822", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 22.7}
+{"time": "2026-10-10 09:42:32", "name": "cover-d-s823", "endpoint": "/create-image-pixflux", "usage": {"type": "generations", "generations": 1.0}, "seconds": 25.7}
+{"time": "2026-10-10 09:42:44", "name": "night-c-s4601", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 83.2}
+{"time": "2026-10-10 09:43:05", "name": "day-c-s4502", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 58.8}
+{"time": "2026-10-10 09:43:17", "name": "emo-shock", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 150.7, "status": "completed"}
+{"time": "2026-10-10 09:43:37", "name": "disc-skull3", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 154.2, "status": "completed"}
+{"time": "2026-10-10 09:43:42", "name": "hourglass", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 163.8, "status": "completed"}
+{"time": "2026-10-10 09:43:49", "name": "night-c-s4602", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 65.5}
+{"time": "2026-10-10 09:44:01", "name": "day-c-s4503", "endpoint": "/create-image-pixen", "usage": {"type": "generations", "generations": 1.0}, "seconds": 55.8}
+{"time": "2026-10-10 09:46:44", "name": "rose-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 66.7, "status": "completed"}
+{"time": "2026-10-10 09:46:52", "name": "rose-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 75.2, "status": "completed"}
+{"time": "2026-10-10 09:46:54", "name": "skull-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 76.9, "status": "completed"}
+{"time": "2026-10-10 09:47:03", "name": "shrug-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 85.9, "status": "completed"}
+{"time": "2026-10-10 09:47:08", "name": "skull-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 91.0, "status": "completed"}
+{"time": "2026-10-10 09:47:27", "name": "taunt-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 110.2, "status": "completed"}
+{"time": "2026-10-10 09:47:44", "name": "shrug-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 126.8, "status": "completed"}
+{"time": "2026-10-10 09:47:44", "name": "taunt-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 127.1, "status": "completed"}
+{"time": "2026-10-10 09:47:56", "name": "think-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 71.8, "status": "completed"}
+{"time": "2026-10-10 09:47:57", "name": "laugh-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 63.4, "status": "completed"}
+{"time": "2026-10-10 09:48:14", "name": "think-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 81.9, "status": "completed"}
+{"time": "2026-10-10 09:48:37", "name": "sweat-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 89.2, "status": "completed"}
+{"time": "2026-10-10 09:48:45", "name": "sweat-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 77.4, "status": "completed"}
+{"time": "2026-10-10 09:49:00", "name": "shock-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 76.0, "status": "completed"}
+{"time": "2026-10-10 09:49:11", "name": "laugh-s2", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 127.7, "status": "completed"}
+{"time": "2026-10-10 09:49:15", "name": "shock-s1", "endpoint": "/animate-with-text-v3", "usage": {"type": "generations", "generations": 1.0}, "seconds": 90.7, "status": "completed"}
+{"time": "2026-10-10 09:50:40", "name": "avatar-toad-g", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 164.1, "status": "completed"}
+{"time": "2026-10-10 09:51:07", "name": "avatar-raccoon-g", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 172.6, "status": "completed"}
+{"time": "2026-10-10 09:51:09", "name": "avatar-badger-g", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 191.6, "status": "completed"}
+{"time": "2026-10-10 09:51:18", "name": "avatar-cat-g", "endpoint": "/generate-image-v2", "usage": {"type": "generations", "generations": 10.0}, "seconds": 160.4, "status": "completed"}

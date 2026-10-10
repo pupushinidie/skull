@@ -137,9 +137,9 @@ export function Mat({ seat, flower, stack, scale, mine, fx = [], dropDepth, elim
         <>
           <span className="sk-mat-ghost" />
           {snuffing ? (
-            <Sprite sheet={SHEETS.snuff} scale={s >= 3 ? 2 : 1} mode="once" frameMs={110} className="sk-snuff" />
+            <Sprite sheet={SHEETS.snuff} scale={s} mode="once" frameMs={110} className="sk-snuff" />
           ) : (
-            <Icon name="out" scale={s >= 3 ? 2 : 1} className="sk-out" title="已淘汰" />
+            <Icon name="out" scale={s} className="sk-out" title="已淘汰" />
           )}
         </>
       ) : (

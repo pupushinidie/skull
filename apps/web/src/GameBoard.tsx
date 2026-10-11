@@ -33,6 +33,8 @@ import { FinalDialog } from "./FinalDialog.js";
 import GameRules from "./GameRules.js";
 import { pickLayout, type BoardLayout, type SeatSlot } from "./layout.js";
 import { DiscImg, FLIP_MS, Icon, Mat, Plate, Sprite, Thinking, type MatFx, type PushDir } from "./pieces.js";
+import { useGameSfx } from "./game-sfx.js";
+import { sfx, useSfxCountdown } from "./gm-sound.js";
 import { GameRoomMenu, SpectateBar } from "./RoomExtras.js";
 import { socket } from "./socket.js";
 import type { Theme } from "./theme.js";
@@ -305,6 +307,10 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   const actions = spectating || hold || autoPlaying ? [] : legalActions(game, selfId);
   const me = view.players.find((player) => player.id === viewId);
   const myTurn = actions.length > 0;
+  // 动作音效（盖垫子、叫价、挑战翻牌……）；「轮到你」和最后 5 秒倒计时只算要自己做决定的时候
+  const needMe = actions.some((action) => action.type !== "nextRound" && action.type !== "revealStack");
+  useGameSfx(game, selfId, needMe, `${view.phase}:${view.turn}:${view.round}`);
+  useSfxCountdown(needMe, secondsLeft);
   const total = totalDiscsInPlay(view);
 
   // 页面在后台、轮到我时标题提示
@@ -338,6 +344,9 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
   }, [onCommand]);
 
   const pickDisc = (discId: string) => {
+    // 选中是 select，再点一下确认是轻点（结果马上有盖垫子 / 失牌的声音）
+    if (selected === discId) sfx.tap();
+    else sfx.select(true);
     if (selected === discId) {
       if (placeType) send({ type: placeType, discId });
       else if (canLose) send({ type: "loseDisc", discId });
@@ -608,6 +617,7 @@ function GameBoard({ room, busy, error, notice, brand, connection, themeToggle, 
             data-tutorial={`hand-disc-${index}`}
             data-face={face}
             disabled={!handSelectable || busy || blocked}
+            {...(!handSelectable || busy || blocked ? {} : { "data-sfx": "none" })}
             onClick={() => disc.id && pickDisc(disc.id)}
             aria-label={`${face === "rose" ? "玫瑰" : face === "skull" ? "骷髅" : face === "lc-up" ? "Last Chance 碟" : "垫子"}${isSelected ? "（已选中，再点一下确认）" : ""}`}
             style={{ width: DISC.w * layout.handScale, height: (DISC.h + 4) * layout.handScale, "--hs": layout.handScale } as CSSProperties}
@@ -904,9 +914,9 @@ function ActionContent(props: {
         {bidType && (
           <div className="sk-bid" data-tutorial="bid-panel">
             <div className="sk-stepper">
-              <button type="button" className="quiet-button sk-step" disabled={bidCount <= minBid || busy} onClick={() => props.onBid(Math.max(minBid, bidCount - 1))} aria-label="少叫一个">−</button>
+              <button type="button" className="quiet-button sk-step" data-sfx="select" disabled={bidCount <= minBid || busy} onClick={() => props.onBid(Math.max(minBid, bidCount - 1))} aria-label="少叫一个">−</button>
               <b className="sk-step-value">{bidCount}</b>
-              <button type="button" className="quiet-button sk-step" disabled={bidCount >= total || busy} onClick={() => props.onBid(Math.min(total, bidCount + 1))} aria-label="多叫一个">+</button>
+              <button type="button" className="quiet-button sk-step" data-sfx="select" disabled={bidCount >= total || busy} onClick={() => props.onBid(Math.min(total, bidCount + 1))} aria-label="多叫一个">+</button>
               <button type="button" className={["primary-button", "sk-big-button", "sk-bid-go", preview?.danger ? "danger" : ""].filter(Boolean).join(" ")} disabled={busy || bidCount < minBid || bidCount > total} onClick={() => onSend({ type: bidType, count: bidCount })} data-tutorial="bid-button">
                 {bidType === "openBid" ? `开叫 ${bidCount}` : `加到 ${bidCount}`}
               </button>

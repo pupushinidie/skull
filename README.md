@@ -277,6 +277,12 @@ const game = buildGame({
 - **提示**：`GameBoard` 的 `hint` 属性显示一句提示（教程的「提示」按钮用 `botHint(view, me, () => 0.99)` 的 `reason`）；正式对局没有传。
 - 截图量化脚本：`~/projects/qa-reports/tools/skull-scenes.sh`（预览页场景 × 四种尺寸 × 两套主题）、`skull-play.mjs`（网页上真打一整局）。
 
+## 声音
+
+还没有背景音乐（`App.tsx` 用 `NO_BGM`，房间和教程里照样有 ♪ 面板调音效、语音）。声音库是共用的 `apps/web/src/gm-sound.tsx`（各仓库同一份，不要单独改）。
+
+动作音效在 `apps/web/src/game-sfx.ts`，按引擎每一步的 `events` 决定响什么，时间和翻牌悬念动画（`FLIP_MS`）对齐：盖垫子是一张皮垫子扣在垫板上的闷响（准备阶段大家同时盖，错开几十毫秒）；开叫 / 加价是一声「喊价」，叫得越多音越高；放弃是 pass；**发起挑战**是一阵越来越快的鼓点（招牌）；翻牌先一声翻动，悬念停顿后揭晓——花是 reveal 加一声清亮的铃，**骷髅**是 bust 加一声不和谐的低沉怪响（招牌）；挑战成功是得分；失去垫子是 hit；出局是 boom；新的一轮是把垫子收回手里；Last Chance 碟 sparkle；失败后亮出自己的垫子 reveal；指定先手是落子。轮到你（同一阶段同一个人只提示一次，挑战时一张张翻不会每张都响）、超时被代做、终局输赢、最后 5 秒倒计时用共用提示音。翻牌算挑战者的动作；别人的减半，观战都算别人的；第一次拿到局面、一下跳了好几步时不出声。点选手里的垫子是 select（再点一下确认是轻点），叫价 +/− 是 select；有人进出、开局、收到聊天、服务器报错也有提示音（`App.tsx` 的 `useRoomSfx`、`sfx.error`）。
+
 ## 新手教程（apps/web/src/tutorial）
 
 做法照站内统一的教程方案（`~/projects/pipeline/handbook/tutorial-notes.md`，参考实现欲罢不能）：不连服务器，浏览器里直接跑规则引擎。

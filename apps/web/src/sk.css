@@ -596,3 +596,19 @@
 @media (min-width: 760px) and (max-width: 1365px) {
   .sk-invite-slot.in-heading .tut-invite-copy span { display: none; }
 }
+
+/* ---------- 全屏背景：首页、等候房间的场景铺满窗口 ---------- */
+.sk-backdrop { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #1a1110; }
+.sk-backdrop-art {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100vw, calc(100vh * 16 / 9));
+  height: max(100vh, calc(100vw * 9 / 16));
+  transform: translate(-50%, -50%);
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+}
+.sk-backdrop-art--day { display: none; }
+.sk-backdrop-veil { position: absolute; inset: 0; background: #0d0807; opacity: 0.4; }
+.app-shell.sk-home > :not(.sk-backdrop):not(.gm-modal-backdrop), .app-shell.sk-room > :not(.sk-backdrop):not(.gm-modal-backdrop) { position: relative; z-index: 1; }

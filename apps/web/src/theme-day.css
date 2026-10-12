@@ -26,3 +26,9 @@
 :root[data-theme="day"] .app-shell .sk-stage .sk-emote-button { color: #f6ead2; background: #3a2015; box-shadow: 0 0 0 var(--px) #070302, inset var(--px) var(--px) 0 0 #7a4a2a, inset calc(var(--px) * -1) calc(var(--px) * -1) 0 0 #0d0604; }
 /* 白天的木桌比较亮，暗角压浅一点 */
 :root[data-theme="day"] .sk-stage::before { background: radial-gradient(ellipse at center, transparent 60%, rgba(60, 30, 10, 0.3) 100%); }
+
+/* 全屏背景：白天版罩色变浅 */
+:root[data-theme="day"] .sk-backdrop { background: #f0e8e4; }
+:root[data-theme="day"] .sk-backdrop-veil { background: #ffffff; opacity: 0.25; }
+:root[data-theme="day"] .sk-backdrop-art--day { display: block; }
+:root[data-theme="day"] .sk-backdrop-art--night { display: none; }

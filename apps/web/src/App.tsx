@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 import { CAPACITY_OPTIONS, EMOTE_IDS, type Capacity, type EmoteBroadcast, type EmoteId, type GameCommand, type LobbyRoomSnapshot, type PublicRoomSummary } from "@skull/game";
-import { avatarArt, discArt, emoteSheet, EMOTE_NAME, heroArt, seatHex } from "./art.js";
+import { avatarArt, discArt, emoteSheet, EMOTE_NAME, heroArt, sceneFor, seatHex } from "./art.js";
 import { useConfirm } from "./confirm.js";
 import GameBoard from "./GameBoard.js";
 import GameRules from "./GameRules.js";
@@ -371,6 +371,7 @@ export function HomeScreen(props: HomeScreenProps) {
   const { mode, busy, error, notice } = props;
   return (
     <main className="app-shell sk-home">
+      <SkBackdrop day={sceneFor("", true)} night={sceneFor("", false)} />
       <header className="topbar">
         <Brand />
         <div className="topbar-right">
@@ -502,6 +503,17 @@ export function HomeScreen(props: HomeScreenProps) {
   );
 }
 
+/** 全屏背景：把对局场景铺满窗口（16:9 居中裁切），上面盖一层罩色让面板更突出。首页和等候房间放在 <main> 的第一个子元素。 */
+function SkBackdrop({ day, night }: { day: string; night: string }) {
+  return (
+    <div className="sk-backdrop" aria-hidden="true">
+      <div className="sk-backdrop-art sk-backdrop-art--day" style={{ backgroundImage: `url(${day})` }} />
+      <div className="sk-backdrop-art sk-backdrop-art--night" style={{ backgroundImage: `url(${night})` }} />
+      <div className="sk-backdrop-veil" />
+    </div>
+  );
+}
+
 function Brand() {
   return (
     <a className="brand" href={import.meta.env.BASE_URL} aria-label="骷髅牌首页">
@@ -544,6 +556,7 @@ export interface RoomScreenProps {
 export function RoomScreen(props: RoomScreenProps) {
   return (
     <main className="app-shell sk-room">
+      <SkBackdrop day={sceneFor(props.room.code, true)} night={sceneFor(props.room.code, false)} />
       <header className="topbar">
         <Brand />
         <div className="topbar-right">
